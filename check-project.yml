@@ -1,0 +1,325 @@
+resources:
+- repo: self
+  clean: true
+
+trigger:
+  batch: true
+  branches:
+    exclude:
+    - master
+
+schedules:
+- cron: "0 2 * * *"
+  displayName: Daily at 2AM
+  branches:
+    include:
+    - master
+
+variables:
+- name: projectName
+  value: 'templ-test01'
+
+- group: ados-group-names-templ-test01
+- group: ados-acls-templ-test01
+- group: ados-secrets
+
+jobs:
+- job: create_project
+  displayName: 'Check project'
+  pool:
+    vmImage: 'ubuntu-latest'
+  steps:
+  - task: UsePythonVersion@0
+    displayName: 'Use Python 3.x'
+
+  - bash: |
+      pip install --user -r requirements.txt
+    displayName: 'Install requirements'
+
+
+  - bash: |
+      python export_project_info.py --projectName $(projectName) --pat $(pat)
+    displayName: 'Export project-related info'
+
+
+  - bash: |
+      sleep 1
+      # python ./get_groups.py --projectScopeDescriptor $PROJECT_SCOPE_DESCRIPTOR --desiredGroupsList '$(administrators-group-name)' '$(developers-group-name)' '$(auditors-group-name)' '$(product-owners-group-name)' '$(projectName) Team' 'Build Administrators' 'Release Administrators' 'Project Administrators' 'Readers' 'Contributors' 'Project Valid Users' --pat $(pat)
+      python ./get_groups.py --projectScopeDescriptor $PROJECT_SCOPE_DESCRIPTOR --desiredGroupsList '$(administrators-group-name)' '$(developers-group-name)' '$(auditors-group-name)' '$(product-owners-group-name)' '$(projectName) Team' 'Project Administrators' 'Project Valid Users' --pat $(pat)
+    displayName: 'Check list of groups'
+    continueOnError: true
+    env:
+      PROJECT_SCOPE_DESCRIPTOR: $(projectScopeDescriptor)
+
+
+  # - bash: |
+  #     sleep 1
+  #     python ./get_group_members.py --projectScopeDescriptor $PROJECT_SCOPE_DESCRIPTOR --groupName 'Build Administrators' --desiredMembersQuantity '0' --pat $(pat)
+  #   displayName: 'Check Build Administrators group members'
+  #   continueOnError: true
+  #   env:
+  #     PROJECT_SCOPE_DESCRIPTOR: $(projectScopeDescriptor)
+
+  # - bash: |
+  #     sleep 1
+  #     python ./get_group_members.py --projectScopeDescriptor $PROJECT_SCOPE_DESCRIPTOR --groupName 'Contributors' --desiredMembersQuantity '0' --pat $(pat)
+  #   displayName: 'Check Contributors group members'
+  #   continueOnError: true
+  #   env:
+  #     PROJECT_SCOPE_DESCRIPTOR: $(projectScopeDescriptor)
+
+  - bash: |
+      sleep 1
+      python ./get_group_members.py --projectScopeDescriptor $PROJECT_SCOPE_DESCRIPTOR --groupName 'Project Administrators' --desiredMembersQuantity '1' --pat $(pat)
+    displayName: 'Check Project Administrators group members'
+    continueOnError: true
+    env:
+      PROJECT_SCOPE_DESCRIPTOR: $(projectScopeDescriptor)
+
+  - bash: |
+      sleep 1
+      python ./get_group_members.py --projectScopeDescriptor $PROJECT_SCOPE_DESCRIPTOR --groupName 'Project Valid Users' --desiredMembersQuantity '0' --pat $(pat)
+    displayName: 'Check Project Valid Users group members'
+    continueOnError: true
+    env:
+      PROJECT_SCOPE_DESCRIPTOR: $(projectScopeDescriptor)
+
+  # - bash: |
+  #     sleep 1
+  #     python ./get_group_members.py --projectScopeDescriptor $PROJECT_SCOPE_DESCRIPTOR --groupName 'Readers' --desiredMembersQuantity '0' --pat $(pat)
+  #   displayName: 'Check Readers group members'
+  #   continueOnError: true
+  #   env:
+  #     PROJECT_SCOPE_DESCRIPTOR: $(projectScopeDescriptor)
+
+
+  - bash: |
+      sleep 1
+      python ./export_group_info.py --projectScopeDescriptor $PROJECT_SCOPE_DESCRIPTOR --groupName $(administrators-group-name) --groupAce $(administrators-group-ace) --pat $(pat)
+    displayName: 'Export $(projectName)-administrators group info'
+    env:
+      PROJECT_SCOPE_DESCRIPTOR: $(projectScopeDescriptor)
+
+  - bash: |
+      sleep 1
+      python ./export_group_info.py --projectScopeDescriptor $PROJECT_SCOPE_DESCRIPTOR --groupName $(developers-group-name) --groupAce $(developers-group-ace) --pat $(pat)
+    displayName: 'Export $(projectName)-developers group info'
+    env:
+      PROJECT_SCOPE_DESCRIPTOR: $(projectScopeDescriptor)
+
+  - bash: |
+      sleep 1
+      python ./export_group_info.py --projectScopeDescriptor $PROJECT_SCOPE_DESCRIPTOR --groupName $(auditors-group-name) --groupAce $(auditors-group-ace) --pat $(pat)
+    displayName: 'Export $(projectName)-auditors group info'
+    env:
+      PROJECT_SCOPE_DESCRIPTOR: $(projectScopeDescriptor)
+
+  - bash: |
+      sleep 1
+      python ./export_group_info.py --projectScopeDescriptor $PROJECT_SCOPE_DESCRIPTOR --groupName $(product-owners-group-name) --groupAce $(product-owners-group-ace) --pat $(pat)
+    displayName: 'Export $(projectName)-product-owners group info'
+    env:
+      PROJECT_SCOPE_DESCRIPTOR: $(projectScopeDescriptor)
+
+
+  - bash: |
+      sleep 1
+      python ./get_ace.py --projectId $PROJECT_ID --namespaceId '52d39943-cb85-4d7f-8fa8-c6baac873819' --groupName $(administrators-group-name) --groupAce $(administrators-group-ace) --allow $(administrators-project-allow-permissions) --deny $(administrators-project-deny-permissions) --pat $(pat)
+    displayName: 'Check Project permissions for $(administrators-group-name) group'
+    continueOnError: true
+    env:
+      PROJECT_ID: $(projectId)
+
+  - bash: |
+      sleep 1
+      python ./get_ace.py --projectId $PROJECT_ID --namespaceId '52d39943-cb85-4d7f-8fa8-c6baac873819' --groupName $(developers-group-name) --groupAce $(developers-group-ace) --allow $(developers-project-allow-permissions) --deny $(developers-project-deny-permissions) --pat $(pat)
+    displayName: 'Check Project permissions for $(developers-group-name) group'
+    continueOnError: true
+    env:
+      PROJECT_ID: $(projectId)
+
+  - bash: |
+      sleep 1
+      python ./get_ace.py --projectId $PROJECT_ID --namespaceId '52d39943-cb85-4d7f-8fa8-c6baac873819' --groupName $(auditors-group-name) --groupAce $(auditors-group-ace) --allow $(auditors-project-allow-permissions) --deny $(auditors-project-deny-permissions) --pat $(pat)
+    displayName: 'Check Project permissions for $(auditors-group-name) group'
+    continueOnError: true
+    env:
+      PROJECT_ID: $(projectId)
+
+  - bash: |
+      sleep 1
+      python ./get_ace.py --projectId $PROJECT_ID --namespaceId '52d39943-cb85-4d7f-8fa8-c6baac873819' --groupName $(product-owners-group-name) --groupAce $(product-owners-group-ace) --allow $(product-owners-project-allow-permissions) --deny $(product-owners-project-deny-permissions) --pat $(pat)
+    displayName: 'Check Project permissions for $(product-owners-group-name) group'
+    continueOnError: true
+    env:
+      PROJECT_ID: $(projectId)
+
+
+  - bash: |
+      sleep 1
+      python ./get_ace.py --projectId $PROJECT_ID --namespaceId 'd34d3680-dfe5-4cc6-a949-7d9c68f73cba' --groupName $(administrators-group-name) --groupAce $(administrators-group-ace) --allow $(administrators-analytics-allow-permissions) --deny $(administrators-analytics-deny-permissions) --pat $(pat)
+    displayName: 'Check Analytics permissions for $(administrators-group-name) group'
+    continueOnError: true
+    env:
+      PROJECT_ID: $(projectId)
+
+  - bash: |
+      sleep 1
+      python ./get_ace.py --projectId $PROJECT_ID --namespaceId 'd34d3680-dfe5-4cc6-a949-7d9c68f73cba' --groupName $(developers-group-name) --groupAce $(developers-group-ace) --allow $(developers-analytics-allow-permissions) --deny $(developers-analytics-deny-permissions) --pat $(pat)
+    displayName: 'Check Analytics permissions for $(developers-group-name) group'
+    continueOnError: true
+    env:
+      PROJECT_ID: $(projectId)
+
+  - bash: |
+      sleep 1
+      python ./get_ace.py --projectId $PROJECT_ID --namespaceId 'd34d3680-dfe5-4cc6-a949-7d9c68f73cba' --groupName $(auditors-group-name) --groupAce $(auditors-group-ace) --allow $(auditors-analytics-allow-permissions) --deny $(auditors-analytics-deny-permissions) --pat $(pat)
+    displayName: 'Check Analytics permissions for $(auditors-group-name) group'
+    continueOnError: true
+    env:
+      PROJECT_ID: $(projectId)
+
+  - bash: |
+      sleep 1
+      python ./get_ace.py --projectId $PROJECT_ID --namespaceId 'd34d3680-dfe5-4cc6-a949-7d9c68f73cba' --groupName $(product-owners-group-name) --groupAce $(product-owners-group-ace) --allow $(product-owners-analytics-allow-permissions) --deny $(product-owners-analytics-deny-permissions) --pat $(pat)
+    displayName: 'Check Analytics permissions for $(product-owners-group-name) group'
+    continueOnError: true
+    env:
+      PROJECT_ID: $(projectId)
+
+
+  - bash: |
+      sleep 1
+      python ./get_ace.py --projectId $PROJECT_ID --namespaceId '2e9eb7ed-3c0a-47d4-87c1-0ffdd275fd87' --groupName $(administrators-group-name) --groupAce $(administrators-group-ace) --allow $(administrators-git-allow-permissions) --deny $(administrators-git-deny-permissions) --pat $(pat)
+    displayName: 'Check Git permissions for $(administrators-group-name) group'
+    continueOnError: true
+    env:
+      PROJECT_ID: $(projectId)
+
+  - bash: |
+      sleep 1
+      python ./get_ace.py --projectId $PROJECT_ID --namespaceId '2e9eb7ed-3c0a-47d4-87c1-0ffdd275fd87' --groupName $(developers-group-name) --groupAce $(developers-group-ace) --allow $(developers-git-allow-permissions) --deny $(developers-git-deny-permissions) --pat $(pat)
+    displayName: 'Check Git permissions for $(developers-group-name) group'
+    continueOnError: true
+    env:
+      PROJECT_ID: $(projectId)
+
+  - bash: |
+      sleep 1
+      python ./get_ace.py --projectId $PROJECT_ID --namespaceId '2e9eb7ed-3c0a-47d4-87c1-0ffdd275fd87' --groupName $(auditors-group-name) --groupAce $(auditors-group-ace) --allow $(auditors-git-allow-permissions) --deny $(auditors-git-deny-permissions) --pat $(pat)
+    displayName: 'Check Git permissions for $(auditors-group-name) group'
+    continueOnError: true
+    env:
+      PROJECT_ID: $(projectId)
+
+  - bash: |
+      sleep 1
+      python ./get_ace.py --projectId $PROJECT_ID --namespaceId '2e9eb7ed-3c0a-47d4-87c1-0ffdd275fd87' --groupName $(product-owners-group-name) --groupAce $(product-owners-group-ace) --allow $(product-owners-git-allow-permissions) --deny $(product-owners-git-deny-permissions) --pat $(pat)
+    displayName: 'Check Git permissions for $(product-owners-group-name) group'
+    continueOnError: true
+    env:
+      PROJECT_ID: $(projectId)
+
+
+  - bash: |
+      sleep 1
+      python ./get_ace.py --projectId $PROJECT_ID --namespaceId '33344d9c-fc72-4d6f-aba5-fa317101a7e9' --groupName $(administrators-group-name) --groupAce $(administrators-group-ace) --allow $(administrators-build-allow-permissions) --deny $(administrators-build-deny-permissions) --pat $(pat)
+    displayName: 'Check Build permissions for $(administrators-group-name) group'
+    continueOnError: true
+    env:
+      PROJECT_ID: $(projectId)
+
+  - bash: |
+      sleep 1
+      python ./get_ace.py --projectId $PROJECT_ID --namespaceId '33344d9c-fc72-4d6f-aba5-fa317101a7e9' --groupName $(developers-group-name) --groupAce $(developers-group-ace) --allow $(developers-build-allow-permissions) --deny $(developers-build-deny-permissions) --pat $(pat)
+    displayName: 'Check Build permissions for $(developers-group-name) group'
+    continueOnError: true
+    env:
+      PROJECT_ID: $(projectId)
+
+  - bash: |
+      sleep 1
+      python ./get_ace.py --projectId $PROJECT_ID --namespaceId '33344d9c-fc72-4d6f-aba5-fa317101a7e9' --groupName $(auditors-group-name) --groupAce $(auditors-group-ace) --allow $(auditors-build-allow-permissions) --deny $(auditors-build-deny-permissions) --pat $(pat)
+    displayName: 'Check Build permissions for $(auditors-group-name) group'
+    continueOnError: true
+    env:
+      PROJECT_ID: $(projectId)
+
+  - bash: |
+      sleep 1
+      python ./get_ace.py --projectId $PROJECT_ID --namespaceId '33344d9c-fc72-4d6f-aba5-fa317101a7e9' --groupName $(product-owners-group-name) --groupAce $(product-owners-group-ace) --allow $(product-owners-build-allow-permissions) --deny $(product-owners-build-deny-permissions) --pat $(pat)
+    displayName: 'Check Build permissions for $(product-owners-group-name) group'
+    continueOnError: true
+    env:
+      PROJECT_ID: $(projectId)
+
+
+  - bash: |
+      sleep 1
+      python ./get_ace.py --projectId $PROJECT_ID --namespaceId 'c788c23e-1b46-4162-8f5e-d7585343b5de' --groupName $(administrators-group-name) --groupAce $(administrators-group-ace) --allow $(administrators-release-allow-permissions) --deny $(administrators-release-deny-permissions) --pat $(pat)
+    displayName: 'Check Release permissions for $(administrators-group-name) group'
+    continueOnError: true
+    env:
+      PROJECT_ID: $(projectId)
+
+  - bash: |
+      sleep 1
+      python ./get_ace.py --projectId $PROJECT_ID --namespaceId 'c788c23e-1b46-4162-8f5e-d7585343b5de' --groupName $(developers-group-name) --groupAce $(developers-group-ace) --allow $(developers-release-allow-permissions) --deny $(developers-release-deny-permissions) --pat $(pat)
+    displayName: 'Check Release permissions for $(developers-group-name) group'
+    continueOnError: true
+    env:
+      PROJECT_ID: $(projectId)
+
+  - bash: |
+      sleep 1
+      python ./get_ace.py --projectId $PROJECT_ID --namespaceId 'c788c23e-1b46-4162-8f5e-d7585343b5de' --groupName $(auditors-group-name) --groupAce $(auditors-group-ace) --allow $(auditors-release-allow-permissions) --deny $(auditors-release-deny-permissions) --pat $(pat)
+    displayName: 'Check Release permissions for $(auditors-group-name) group'
+    continueOnError: true
+    env:
+      PROJECT_ID: $(projectId)
+
+  - bash: |
+      sleep 1
+      python ./get_ace.py --projectId $PROJECT_ID --namespaceId 'c788c23e-1b46-4162-8f5e-d7585343b5de' --groupName $(product-owners-group-name) --groupAce $(product-owners-group-ace) --allow $(product-owners-release-allow-permissions) --deny $(product-owners-release-deny-permissions) --pat $(pat)
+    displayName: 'Check Release permissions for $(product-owners-group-name) group'
+    continueOnError: true
+    env:
+      PROJECT_ID: $(projectId)
+
+
+  - bash: |
+      python export_feed_info.py --projectName $(projectName) --pat $(pat)
+    displayName: 'Export feed-related info'
+
+
+  - bash: |
+      sleep 1
+      python ./get_feed_acl.py --projectName $(projectName) --groupName $(administrators-group-name) --groupAce $(administrators-group-ace) --feedId $FEED_ID --role $(administrators-feed-permissions) --pat $(pat)
+    displayName: 'Check Feed permissions for $(administrators-group-name) group'
+    continueOnError: true
+    env:
+      FEED_ID: $(feedId)
+
+  - bash: |
+      sleep 1
+      python ./get_feed_acl.py --projectName $(projectName) --groupName $(developers-group-name) --groupAce $(developers-group-ace) --feedId $FEED_ID --role $(developers-feed-permissions) --pat $(pat)
+    displayName: 'Check Feed permissions for $(developers-group-name) group'
+    continueOnError: true
+    env:
+      FEED_ID: $(feedId)
+
+  - bash: |
+      sleep 1
+      python ./get_feed_acl.py --projectName $(projectName) --groupName $(auditors-group-name) --groupAce $(auditors-group-ace) --feedId $FEED_ID --role $(auditors-feed-permissions) --pat $(pat)
+    displayName: 'Check Feed permissions for $(auditors-group-name) group'
+    continueOnError: true
+    env:
+      FEED_ID: $(feedId)
+
+  - bash: |
+      sleep 1
+      python ./get_feed_acl.py --projectName $(projectName) --groupName $(product-owners-group-name) --groupAce $(product-owners-group-ace) --feedId $FEED_ID --role $(product-owners-feed-permissions) --pat $(pat)
+    displayName: 'Check Feed permissions for $(product-owners-group-name) group'
+    continueOnError: true
+    env:
+      FEED_ID: $(feedId)
