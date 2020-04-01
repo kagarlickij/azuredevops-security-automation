@@ -313,5 +313,5 @@ If you want to add more groups or remove some of existing don't forget to change
 ### Azure DevOps specific syntax in scripts
 All Python scripts can be executed on any machine with Python 3 runtime, e.g. `python create_project.py --projectName 'test1' --pat 'a***q'`  
 However some Azure DevOps specific syntax is present in scripts:  
-1. All `print` functions have `[INFO]` or `[ERROR]` prefixes to make output more readable and properly [colored in Azure DevOps logs](https://developercommunity.visualstudio.com/content/problem/440605/write-host-foreground-color-with-powershell-task-i.html)  
+1. All `print` functions have `[INFO]` or `[ERROR]` prefixes to make output more readable and properly [colored in Azure DevOps logs](https://developercommunity.visualstudio.com/content/problem/440605/write-host-foreground-color-with-powershell-task-i.html), [example](https://prnt.sc/rqzu2x)  
 2. Environment variables are set via [`task.setvariable` logging command](https://docs.microsoft.com/en-us/azure/devops/pipelines/process/variables?view=azure-devops&tabs=yaml%2Cbatch#set-variables-in-scripts)  
