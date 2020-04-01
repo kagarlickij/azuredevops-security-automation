@@ -223,6 +223,13 @@ jobs:
 
   - bash: |
       sleep 1
+      python ./check_git_repos.py --projectName $(projectName) --pat $(pat)
+    displayName: 'Check Git repos settings'
+    continueOnError: true
+
+
+  - bash: |
+      sleep 1
       python ./get_ace.py --projectId $PROJECT_ID --namespaceId '33344d9c-fc72-4d6f-aba5-fa317101a7e9' --groupName $(administrators-group-name) --groupAce $(administrators-group-ace) --allow $(administrators-build-allow-permissions) --deny $(administrators-build-deny-permissions) --pat $(pat)
     displayName: 'Check Build permissions for $(administrators-group-name) group'
     continueOnError: true

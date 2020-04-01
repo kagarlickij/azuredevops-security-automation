@@ -1,6 +1,6 @@
 | Build status | pylint Score | License |
 | ------------- | ------------- | ------------- |
-| [![Build Status](https://dev.azure.com/kagarlickij/test/_apis/build/status/create-project?branchName=master)](https://dev.azure.com/kagarlickij/test/_build/latest?definitionId=44&branchName=master) | ![pylint Score](https://mperlet.github.io/pybadge/badges/9.52.svg) | [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE.md) |
+| [![Build Status](https://dev.azure.com/kagarlickij/test/_apis/build/status/create-project?branchName=master)](https://dev.azure.com/kagarlickij/test/_build/latest?definitionId=44&branchName=master) | ![pylint Score](https://mperlet.github.io/pybadge/badges/9.59.svg) | [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE.md) |
 
 # Challenge
 Azure DevOps gives a nice opportunity to have dedicated projects for dedicated teams and/or projects  
@@ -207,13 +207,21 @@ As well as [set_ace.py](set_ace.py) [get_ace.py](get_ace.py) knows about differe
 7. Check Git permissions for each group  
 [get_ace.py](get_ace.py) script will check if current permissions match desired  
 
-8. Check Build permissions for each group  
+8. Check Git repos settings [task](check_git_repos.py) performs the following checks on all repos in the project:  
+Check if all branches follow naming standards: allowed names are `master`, `feature/` and `bugfix/`  
+Check if all branches are up to date: latest commit shouldn't be older than 30 days, however `master` branch is excluded from this check  
+Check if all Pull requests are up to date: pull requests shouldn't be older than 10 days  
+All 3 checks generate warnings, not errors  
+The latest one checks if `master` branch has at least one policy assigned, and if now, error will be raised  
+Some repos can be excluded from checking by putting name to [excluded_repos.txt](excluded_repos.txt) file  
+
+9. Check Build permissions for each group  
 [get_ace.py](get_ace.py) script will check if current permissions match desired  
 
-9. Check Release permissions for each group  
+10. Check Release permissions for each group  
 [get_ace.py](get_ace.py) script will check if current permissions match desired  
 
-10. Export feed info  
+11. Export feed info  
 `FEED_ID` var is exported for further usage  
 
 11. Check Artifact feed permissions for each group  
