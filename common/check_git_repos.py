@@ -7,7 +7,7 @@ import requests
 
 PARSER = argparse.ArgumentParser()
 
-PARSER.add_argument('--organization', type=str, default='kagarlickij')
+PARSER.add_argument('--organization', type=str)
 PARSER.add_argument('--projectName', type=str)
 PARSER.add_argument('--pat', type=str)
 
@@ -21,9 +21,9 @@ HEADERS = {
     'Content-Type': 'application/json',
 }
 
-URL = 'https://dev.azure.com/{}/{}/_apis/git/repositories?api-version=5.0'.format(ARGS.organization, ARGS.projectName)
+URL = '{}/{}/_apis/git/repositories?api-version=5.0'.format(ARGS.organization, ARGS.projectName)
 
-with open('excluded_repos.txt') as text_file:
+with open('./common/excluded_repos.txt') as text_file:
     EXCLUDED_REPOS = text_file.read().splitlines()
 print(f'[INFO] Excluded repos: {EXCLUDED_REPOS}')
 
@@ -51,7 +51,7 @@ else:
         else:
             date_format = '%Y-%m-%d'
 
-            URL = 'https://dev.azure.com/{}/{}/_apis/git/repositories/{}/refs?api-version=5.0'.format(ARGS.organization, ARGS.projectName, REPO_ID)
+            URL = '{}/{}/_apis/git/repositories/{}/refs?api-version=5.0'.format(ARGS.organization, ARGS.projectName, REPO_ID)
             HEADERS = {
                 'Content-Type': 'application/json',
             }
@@ -79,7 +79,7 @@ else:
                     BRANCH_NAME = BRANCH['name']
                     BRANCH_SHORTNAME = BRANCH_NAME.replace('refs/heads/', '')
                     if BRANCH_SHORTNAME == 'master':
-                        URL = 'https://dev.azure.com/{}/{}/_apis/git/policy/configurations?REPO_ID={}&refName={}&api-version=5.0-preview.1'.format(ARGS.organization, ARGS.projectName, REPO_ID, BRANCH_NAME)
+                        URL = '{}/{}/_apis/git/policy/configurations?REPO_ID={}&refName={}&api-version=5.0-preview.1'.format(ARGS.organization, ARGS.projectName, REPO_ID, BRANCH_NAME)
                         try:
                             RESPONSE = requests.get(URL, headers=HEADERS, auth=(ARGS.pat,''))
                             RESPONSE.raise_for_status()
@@ -96,7 +96,7 @@ else:
                             MASTER_POLICIES_QUANTITY = int(POLICY_COUNTER)
 
                     elif ('feature/' in BRANCH_SHORTNAME or 'bugfix/' in BRANCH_SHORTNAME):
-                        URL = 'https://dev.azure.com/{}/_apis/git/repositories/{}/commits?searchCriteria.itemVersion.version={}&api-version=5.0'.format(ARGS.organization, ARGS.projectName, BRANCH_SHORTNAME)
+                        URL = '{}/_apis/git/repositories/{}/commits?searchCriteria.itemVersion.version={}&api-version=5.0'.format(ARGS.organization, ARGS.projectName, BRANCH_SHORTNAME)
                         try:
                             RESPONSE = requests.get(URL, headers=HEADERS, auth=(ARGS.pat,''))
                             RESPONSE.raise_for_status()
@@ -132,7 +132,7 @@ else:
                         UNKNOWN_BRANCHES.append(BRANCH_NAME)
 
 
-                URL = 'https://dev.azure.com/{0}/{1}/_apis/git/repositories/{2}/pullrequests?api-version=5.0'.format(ARGS.organization, ARGS.projectName, REPO_ID)
+                URL = '{}/{}/_apis/git/repositories/{}/pullrequests?api-version=5.0'.format(ARGS.organization, ARGS.projectName, REPO_ID)
                 try:
                     RESPONSE = requests.get(URL, headers=HEADERS, auth=(ARGS.pat,''))
                     RESPONSE.raise_for_status()

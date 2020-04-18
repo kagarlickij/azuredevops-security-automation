@@ -7,22 +7,29 @@ PARSER = argparse.ArgumentParser()
 
 PARSER.add_argument('--organization', type=str, default='kagarlickij')
 PARSER.add_argument('--projectName', type=str)
+PARSER.add_argument('--feedName', type=str)
 PARSER.add_argument('--pat', type=str)
 
 ARGS = PARSER.parse_args()
 
-if not ARGS.projectName or not ARGS.pat:
+if not ARGS.projectName or not ARGS.feedName or not ARGS.pat:
     print(f'[ERROR] missing required arguments')
     sys.exit(1)
 
-print(f'[INFO] Deleting tmp Release pipeline..')
-URL = 'https://vsrm.dev.azure.com/{}/{}/_apis/release/definitions/1?api-version=5.0'.format(ARGS.organization, ARGS.projectName)
+print(f'[INFO] Creating {ARGS.feedName} feed..')
+URL = 'https://feeds.dev.azure.com/{}/{}/_apis/packaging/feeds?api-version=5.0-preview.1'.format(ARGS.organization, ARGS.projectName)
 HEADERS = {
     'Content-Type': 'application/json',
 }
 
+DATA = {
+    'name': f'{ARGS.feedName}',
+    'upstreamEnabled': 'false',
+    'capabilities': 'defaultCapabilities'
+}
+
 try:
-    RESPONSE = requests.delete(URL, headers=HEADERS, auth=(ARGS.pat,''))
+    RESPONSE = requests.post(URL, headers=HEADERS, data=json.dumps(DATA), auth=(ARGS.pat,''))
     RESPONSE.raise_for_status()
 except Exception as err:
     print(f'[ERROR] {err}')
@@ -34,8 +41,8 @@ except Exception as err:
     sys.exit(1)
 else:
     RESPONSE_CODE = RESPONSE.status_code
-    if RESPONSE_CODE == 204:
-        print(f'[INFO] tmp Release pipeline has been deleted successfully')
+    if RESPONSE_CODE == 201:
+        print(f'[INFO] Feed {ARGS.feedName} has been created successfully')
     else:
-        print(f'[ERROR] tmp Release pipeline has not been deleted')
+        print(f'[ERROR] Feed {ARGS.feedName} has not been created')
         sys.exit(1)

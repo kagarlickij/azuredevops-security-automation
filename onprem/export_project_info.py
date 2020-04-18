@@ -5,7 +5,7 @@ import requests
 
 PARSER = argparse.ArgumentParser()
 
-PARSER.add_argument('--organization', type=str, default='kagarlickij')
+PARSER.add_argument('--organization', type=str, default='https://ados.demo.kagarlickij.com/DefaultCollection')
 PARSER.add_argument('--projectName', type=str)
 PARSER.add_argument('--pat', type=str)
 
@@ -15,7 +15,7 @@ if not ARGS.projectName or not ARGS.pat:
     print(f'[ERROR] missing required arguments')
     sys.exit(1)
 
-URL = 'https://feeds.dev.azure.com/{}/_apis/packaging/feeds?api-version=5.0-preview.1'.format(ARGS.organization)
+URL = '{}/_apis/projects?api-version=5.0'.format(ARGS.organization)
 HEADERS = {
     'Content-Type': 'application/json',
 }
@@ -32,18 +32,18 @@ except Exception as err:
     print(f'[ERROR] Response message: {MESSAGE}')
     sys.exit(1)
 else:
-    FEEDS = RESPONSE.json()['value']
+    PROJECT_LIST = RESPONSE.json()['value']
 
-    for FEED in FEEDS:
-        if FEED['name'] == ARGS.projectName:
-            FEED_ID = FEED['id']
+    for PROJECT in PROJECT_LIST:
+        if PROJECT['name'] == ARGS.projectName:
+            PROJECT_ID = PROJECT['id']
             break
 
     try:
-        FEED_ID
+        PROJECT_ID
     except NameError:
-        print(f'[ERROR] Feed {ARGS.projectName} was not found')
+        print('[ERROR] projectId has not been obtained')
         sys.exit(1)
     else:
-        print(f'[INFO] Feed {ARGS.projectName} ID = {FEED_ID}')
-        print(f'##vso[task.setvariable variable=feedId]{FEED_ID}')
+        print(f'[INFO] projectId = {PROJECT_ID}')
+        print(f'##vso[task.setvariable variable=projectId]{PROJECT_ID}')

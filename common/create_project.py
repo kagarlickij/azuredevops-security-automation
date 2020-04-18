@@ -5,7 +5,7 @@ import requests
 
 PARSER = argparse.ArgumentParser()
 
-PARSER.add_argument('--organization', type=str, default='kagarlickij')
+PARSER.add_argument('--organization', type=str)
 PARSER.add_argument('--projectName', type=str)
 PARSER.add_argument('--projectDescription', type=str)
 PARSER.add_argument('--processTemplate', type=str, default='6b724908-ef14-45cf-84f8-768b5384da45')
@@ -18,7 +18,7 @@ if not ARGS.projectName or not ARGS.pat:
     sys.exit(1)
 
 print(f'[INFO] Creating {ARGS.projectName} project..')
-URL = 'https://dev.azure.com/{}/_apis/projects?api-version=5.0'.format(ARGS.organization)
+URL = '{}/_apis/projects?api-version=5.0'.format(ARGS.organization)
 HEADERS = {
     'Content-Type': 'application/json',
 }

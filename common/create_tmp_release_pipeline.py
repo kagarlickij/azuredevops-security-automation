@@ -5,7 +5,7 @@ import requests
 
 PARSER = argparse.ArgumentParser()
 
-PARSER.add_argument('--organization', type=str, default='kagarlickij')
+PARSER.add_argument('--organization', type=str)
 PARSER.add_argument('--projectName', type=str)
 PARSER.add_argument('--pat', type=str)
 
@@ -16,7 +16,7 @@ if not ARGS.projectName or not ARGS.pat:
     sys.exit(1)
 
 print(f'[INFO] Creating tmp Release pipeline..')
-URL = 'https://vsrm.dev.azure.com/{}/{}/_apis/release/definitions?api-version=5.0'.format(ARGS.organization, ARGS.projectName)
+URL = '{}/{}/_apis/release/definitions?api-version=5.0'.format(ARGS.organization, ARGS.projectName)
 HEADERS = {
     'Content-Type': 'application/json',
 }

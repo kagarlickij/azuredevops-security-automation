@@ -12,76 +12,87 @@ Create common groups and set relevant permissions to keep Azure DevOps users hap
 To keep enterprise security folks happy too we can setup security monitoring to ensure that nobody violates rules  
 And to keep operations happy, we can automate both projects creation and verification using Azure DevOps API and Pipelines  
 
-## HLD diagram
+# HLD diagram
 ![diagram](diagram.png)
 
-## How-to use
+# How-to use
 1. Fork this repo
-2. Put name of the new project to (create-project.yml)[create-project.yml] and (check-project.yml)[check-project.yml] `projectName` variable
+2. Put name of the new project to (./cloud/create-project.yml)[./cloud/create-project.yml] and (./cloud/check-project.yml)[./cloud/check-project.yml] `projectName` variable
 3. Clone or create new Variable groups - `ados-group-names-$projectName` and `ados-acls-$projectName`, replace `$projectName` with the name you used in previous step
 4. If you cloned Variable groups ensure that you're happy with values - **both Variable groups and values are described in detail below**
-5. Put Variable group names to (create-project.yml)[create-project.yml] and (check-project.yml)[check-project.yml]
-6. Create new Azure DevOps pipeline using (create-project.yml)[create-project.yml], rename it, run and check logs
-7. Create new Azure DevOps pipeline using (check-project.yml)[check-project.yml], rename it, run and check logs
+5. Put Variable group names to (./cloud/create-project.yml)[./cloud/create-project.yml] and (./cloud/check-project.yml)[./cloud/check-project.yml]
+6. Create new Azure DevOps pipeline using (./cloud/create-project.yml)[./cloud/create-project.yml], rename it, run and check logs
+7. Create new Azure DevOps pipeline using (./cloud/check-project.yml)[./cloud/check-project.yml], rename it, run and check logs
 
-## Azure DevOps APIs
-### Azure DevOps UI vs API
+# Azure DevOps APIs
+## Azure DevOps UI vs API
 In Azure DevOps UI naming is a bit different from API naming, e.g. in Artifact feed UI role is called "Owner" and API name is "administrator": [screenshot](https://prnt.sc/rq78ye)
 
-### Azure DevOps APIs and Versions
+## Azure DevOps APIs and Versions
 Yes, you read it right - Azure DevOps has a few APIs, e.g.:  
 regular `https://dev.azure.com/{}/_apis/projects?api-version=5.0` to create Project,  
 new `https://vssps.dev.azure.com/{}/_apis/graph/groups?scopeDescriptor={}&api-version=5.0-preview.1` to create Group  
 and dedicated `https://feeds.dev.azure.com/{}/{}/_apis/packaging/feeds?api-version=5.0-preview.1` to create Artifact feed  
 Here's summary of scripts vs used APIs (actions should be understandable from script names):  
 `https://dev.azure.com` version `5.0` (can be switched to `5.1` if necessary):
-1. [create_project](create_project.py)
-2. [export_project](export_project.py)
-3. [get_ace](get_ace.py)
-4. [set_ace](set_ace.py)
+1. [./cloud/create_project](./common/create_project.py)
+2. [./cloud/export_project](./cloud/export_project.py)
+3. [./cloud/get_ace](./common/get_ace.py)
+4. [./cloud/set_ace](./common/set_ace.py)
 
-`https://vssps.dev.azure.com` version `5.0-preview.1` (can be switched to `5.1-preview.1` if necessary):
-1. [create_group](create_group.py)
-2. [get_group](get_group.py)
-3. [delete_group](delete_group.py)
-4. [get_group_members](get_group_members.py)
-5. [export_group_info](export_group_info.py)
-6. [export_project_info](export_project_info.py)
+`https://vssps.dev.azure.com` version `5.0-preview.1` vs TFSSecurity CLI:
+1. [./cloud/create_group](./cloud/create_group.py)
+2. [./cloud/get_group](./cloud/get_group.py)
+3. [./cloud/delete_group](./cloud/delete_group.py)
+4. [./cloud/get_group_members](./cloud/get_group_members.py)
+5. [./cloud/export_group_info](./cloud/export_group_info.py)
+6. [./cloud/export_project_info](./cloud/export_project_info.py)  
+This API in not available in <span style="color:red">Azure DevOps Server v2019.Update1.1</span> so [TFSSecurity](https://docs.microsoft.com/en-us/azure/devops/server/command-line/tfssecurity-cmd?view=azure-devops-2019&viewFallbackFrom=azure-devops) CLI must be used  
+TFSSecurity CLI can be executed on server where Azure DevOps is installed, so you have to install agent on that (obviously Windows-based) machine  
+This is annoying because Python tasks on self-managed Windows agents are problematic, so I had to install Python manually and wrapped Python calls into PowerShell in tasks  
+For Azure DevOps in the Cloud Python calls were wrapped with Bash to add `sleep 1` (see details bellow in "Azure DevOps API throttling" section) but Windows Server doesn't have Bash by default and I decided not to install it and use PowerShell  
+Another important thing is account used to run Azure DevOps agent - it must have admin permissions to use TFSSecurity and by default it's just a network service. So be control who can use that agent with high privileges in Azure DevOps  
+The last but not least complain about TFSSecurity is it's output - [poorly formatted console output](https://prnt.sc/ruxi6y ). No YAML. No CSV. No JSON. So I had to develop a few workarounds to manage it, e.g. [./onprem/export_group_info.py](./onprem/export_group_info.py) Hope separate boiler in hell is waiting for TFSSecurity CLI developers :pray:  
 
 `https://feeds.dev.azure.com` version `5.0-preview.1` (can be switched to `5.1-preview.1` if necessary):
-1. [create_feed](create_feed.py)
-2. [export_feed_info](export_feed_info.py)
-3. [set_feed_acl](set_feed_acl.py)
-4. [get_feed_acl](get_feed_acl.py)
+1. [./cloud/create_feed](./cloud/create_feed.py)
+2. [./cloud/export_feed_info](./cloud/export_feed_info.py)
+3. [./cloud/set_feed_acl](./cloud/set_feed_acl.py)
+4. [./cloud/get_feed_acl](./cloud/get_feed_acl.py)  
+This API in not available in <span style="color:red">Azure DevOps Server v2019.Update1.1</span> so [regular one](https://docs.microsoft.com/en-us/rest/api/azure/devops/artifacts/feed%20%20management/create%20feed?view=azure-devops-server-rest-5.0) must be used  
+It has an important limitation - feeds can not be created in project scope, only on collection level  
 
 `https://vsrm.dev.azure.com` version `5.0` (can be switched to `5.1` if necessary):
-1. [create_tmp_release_pipeline](create_tmp_release_pipeline.py)
-2. [delete_tmp_release_pipeline](delete_tmp_release_pipeline.py)
+1. [./cloud/create_tmp_release_pipeline](./common/create_tmp_release_pipeline.py)
+2. [./cloud/delete_tmp_release_pipeline](./common/delete_tmp_release_pipeline.py)
 
-### Personal vs System access token
+Azure DevOps Server (on-premise) doesn't support certain APIs, e.g. `https://vssps.dev.azure.com` version `5.0-preview.1` must be replaces with [TFSSecurity](https://docs.microsoft.com/en-us/azure/devops/server/command-line/tfssecurity-cmd?view=azure-devops-2019)  
+Version `5.0-preview.1` can't be used as indicator because Azure DevOps Server uses Version `5.0-preview.3` for [some actions](https://docs.microsoft.com/en-us/azure/devops/organizations/projects/restore-project?view=azure-devops-2019)  
+
+## Personal vs System access token
 Default permissions of System access token are not enough to perform all CRUD actions  
 Those permissions can be extended, but it's too dangerous because other pipelines will use them  
 So solution is to create another "root" user and use it's Personal Access Token  
 
-### Azure DevOps API throttling
+## Azure DevOps API throttling
 On the one hand I never had `429` from Azure DevOps API but on the other hand I had number of situations when after received `200` change wasn't present  
 So I added those ugly `sleep 1` actions to all pipeline's tasks and a few tasks with `sleep 10` to wait until certain resources are created  
 
-### Response codes
+## Response codes
 Azure DevOps API can respond with `2**` codes - some of them stand for real success (e.g. resource created) but some mean that call was answered  
 To address this situation some scripts use not only `Exception` for `requests` but also check `status_code` of the response to match desired e.g. `204` in `delete_group`
 
-### Organization
+## Organization
 All scripts have `--organization` parameter but pipelines don't insert it because default value is name of my Azure DevOps organization - `kagarlickij`  
 Don't forget to change it in your fork  
 
-### Project ID vs Project scope descriptor
+## Project ID vs Project scope descriptor
 APIs (e.g. `https://vssps.dev.azure.com`) use [scopeDescriptor](scopeDescriptor)
 ..and some APIs use (`https://dev.azure.com`) tokens (described above) that consist of [projectId](https://docs.microsoft.com/en-us/rest/api/azure/devops/core/projects/get%20project%20properties?view=azure-devops-rest-5.1#uri-parameters) and separator characters  
-For pipeline's tasks usage `scopeDescriptor` is exported as `PROJECT_SCOPE_DESCRIPTOR` and `projectId` is exported as `PROJECT_ID` by [export_project_info.py](export_project_info.py) script  
+For pipeline's tasks usage `scopeDescriptor` is exported as `PROJECT_SCOPE_DESCRIPTOR` and `projectId` is exported as `PROJECT_ID` by [./cloud/export_project_info.py](./cloud/export_project_info.py) script  
 
-## Azure DevOps Security basics
-### Security namespaces
+# Azure DevOps Security basics
+## Security namespaces
 As per [documentation](https://docs.microsoft.com/en-us/rest/api/azure/devops/security/security%20namespaces?view=azure-devops-rest-5.1) security namespaces are used to store access control lists (ACLs) on tokens  
 You can get list of namespaces with `GET 'https://dev.azure.com/{organization}/_apis/securitynamespaces?api-version=5.1'`  
 As for now, there're 60 namespaces, for our purposes we'll use a few of them:
@@ -91,7 +102,7 @@ As for now, there're 60 namespaces, for our purposes we'll use a few of them:
 `33344d9c-fc72-4d6f-aba5-fa317101a7e9` for Builds  
 `c788c23e-1b46-4162-8f5e-d7585343b5de` for ReleaseManagement  
 
-### Tokens
+## Tokens
 As per [documentation](https://docs.microsoft.com/en-us/azure/devops/cli/security_tokens?view=azure-devops) Tokens are arbitrary strings representing resources in Azure DevOps.  
 Token format differs per resource type, however hierarchy and separator characters are common between all tokens  
 To get Token for security namespace run `GET https://dev.azure.com/{organization}/_apis/accesscontrollists/{securityNamespaceId}?api-version=5.1`  
@@ -99,27 +110,27 @@ For Project namespace token format is `$PROJECT:vstfs:///Classification/TeamProj
 For Git Repositories namespace token format is `repoV2/{projectId}`  
 For AnalyticsViews namespace token format is `$/Shared/{projectId}`  
 For Build and ReleaseManagement it's just `{projectId}`  
-Those reflected in [get_ace](get_ace.py) and [set_ace](set_ace.py) conditions  
+Those reflected in [./cloud/get_ace](./common/get_ace.py) and [./cloud/set_ace](./common/set_ace.py) conditions  
 
-### Numbers for permissions
+## Numbers for permissions
 Permissions for majority of resources are present as sum of "bits" (numbers) for actions in namespace  
 e.g. in AnalyticsViews user (or group) that has to have "Read" (`1` as a "bit" value) and "Execute" (`8` as a "bit" value) permissions, "allow" field in ACL's "acesDictionary" must have `9` as value  
 The same logic is fair for "deny" rules, and resulting ACL looks like [this](https://prnt.sc/rqat79)  
 Artifact feed permissions are different, there are no "acesDictionary" and "bits", more simple concept of "roles" is used instead: [screenshot](https://prnt.sc/rqaz0p)
 
-### Create entity and set permissions
+## Create entity and set permissions
 As mentioned above permissions are set in resource's ACL and existing entities (user or group) must be used  
 So there's no way to create user and group and set permissions at the same time  
 In ACL [descriptors](https://docs.microsoft.com/en-us/rest/api/azure/devops/graph/?view=azure-devops-rest-5.1#descriptors) are used instead of group (user) names to provide cross-account capabilities  
 
-## Azure DevOps Artifact feeds
-### Artifact feed name is still "busy" after feed is deleted
+# Azure DevOps Artifact feeds
+## Artifact feed name is still "busy" after feed is deleted
 Current solution creates dedicated project-scoped feed for each project  
 It might be a situation when project has to be deleted and then created again  
 But feed with the same name will fail to create even if it was deleted from "Deleted feeds" (trashbox for feeds)  
 e.g. when I'm trying to create `test1` feed I'm getting response ["A feed named 'test1' already exists."](https://prnt.sc/rqp4qy) but when I'm listing feeds `test1` does not exist in both [API](https://prnt.sc/rqp5na) and [UI](https://prnt.sc/rqp6fo) including ["Deleted feeds"](https://prnt.sc/rqp62s)  
 
-## `create-project` pipeline
+# `create-project` pipeline
 `create-project` pipeline creates new project based on "security template" and consist of the following steps:
 1. Create project  
 `--processTemplate` param set to be Scrum ('6b724908-ef14-45cf-84f8-768b5384da45') by default  
@@ -155,14 +166,14 @@ Exports group ACE as a var for further usage
 Format of ACE from time to time causes incorrect padding in Python so [fix](https://stackoverflow.com/questions/2941995/python-ignore-incorrect-padding-error-when-base64-decoding) is applied  
 
 7. Set Project permissions for each group  
-Here's the first time when [set_ace.py](set_ace.py) script comes into the game  
+Here's the first time when [./common/set_ace.py](./common/set_ace.py) script comes into the game  
 It will be used to set almost all permissions so threat it with extra care  
 
 8. Set Analytics permissions for each group  
 Analytics views are located in the same UI section Project permissions but have different security namespace and token format  
 
 9. Set Git permissions for each group  
-This security namespace also has different token format and [set_ace.py](set_ace.py) knows about that  
+This security namespace also has different token format and [./common/set_ace.py](./common/set_ace.py) knows about that  
 
 10. Set Build permissions for each group  
 Nothing too special here, token in this security namespace is equal to project id
@@ -171,17 +182,17 @@ Nothing too special here, token in this security namespace is equal to project i
 This task will fail if tmp Release pipeline was not created (Step #3)  
 
 12. Create Artifact feed  
-Feed is created for specific project only, it has default capabilities and upstream disabled - all is hardcoded in [create_feed.py](create_feed.py)  
-`https://feeds.dev.azure.com` API must be used, so dedicated [create_feed.py](create_feed.py) script was created  
+Feed is created for specific project only, it has default capabilities and upstream disabled - all is hardcoded in [./cloud/create_feed.py](./cloud/create_feed.py)  
+`https://feeds.dev.azure.com` API must be used, so dedicated [./cloud/create_feed.py](./cloud/create_feed.py) script was created  
 
 13. Export feed info  
 `FEED_ID` var is exported for further usage  
 
 14. Set feed permissions
 As described above, feeds use roles instead of permissions "bits" and `https://feeds.dev.azure.com` instead of `https://dev.azure.com/`  
-So dedicated [set_feed_acl.py](set_feed_acl.py) script is used instead of [set_ace.py](set_ace.py)  
+So dedicated [./cloud/set_feed_acl.py](./cloud/set_feed_acl.py) script is used instead of [./common/set_ace.py](./common/set_ace.py)  
 
-## `check-project` pipeline
+# `check-project` pipeline
 1. Export project-related info  
 As mentioned above `PROJECT_ID` and `PROJECT_SCOPE_DESCRIPTOR` vars are exported for further usage  
 
@@ -198,16 +209,16 @@ Exports group ACE as a var for further usage
 Format of ACE from time to time causes incorrect padding in Python so [fix](https://stackoverflow.com/questions/2941995/python-ignore-incorrect-padding-error-when-base64-decoding) is applied  
 
 5. Check Project permissions for each group  
-[get_ace.py](get_ace.py) script will check if current permissions match desired  
-As well as [set_ace.py](set_ace.py) [get_ace.py](get_ace.py) knows about different tokens for different security namespaces  
+[./common/get_ace.py](./common/get_ace.py) script will check if current permissions match desired  
+As well as [./common/set_ace.py](./common/set_ace.py) [./common/get_ace.py](./common/get_ace.py) knows about different tokens for different security namespaces  
 
 6. Check Analytics permissions for each group  
-[get_ace.py](get_ace.py) script will check if current permissions match desired  
+[./common/get_ace.py](./common/get_ace.py) script will check if current permissions match desired  
 
 7. Check Git permissions for each group  
-[get_ace.py](get_ace.py) script will check if current permissions match desired  
+[./common/get_ace.py](./common/get_ace.py) script will check if current permissions match desired  
 
-8. Check Git repos settings [task](check_git_repos.py) performs the following checks on all repos in the project:  
+8. Check Git repos settings [task](./cloud/check_git_repos.py) performs the following checks on all repos in the project:  
 Check if all branches follow naming standards: allowed names are `master`, `feature/` and `bugfix/`  
 Check if all branches are up to date: latest commit shouldn't be older than 30 days, however `master` branch is excluded from this check  
 Check if all Pull requests are up to date: pull requests shouldn't be older than 10 days  
@@ -216,26 +227,26 @@ The latest one checks if `master` branch has at least one policy assigned, and i
 Some repos can be excluded from checking by putting name to [excluded_repos.txt](excluded_repos.txt) file  
 
 9. Check Build permissions for each group  
-[get_ace.py](get_ace.py) script will check if current permissions match desired  
+[./common/get_ace.py](./common/get_ace.py) script will check if current permissions match desired  
 
 10. Check Release permissions for each group  
-[get_ace.py](get_ace.py) script will check if current permissions match desired  
+[./common/get_ace.py](./common/get_ace.py) script will check if current permissions match desired  
 
 11. Export feed info  
 `FEED_ID` var is exported for further usage  
 
 11. Check Artifact feed permissions for each group  
-[get_feed_acl.py](get_feed_acl.py) script is used instead of [get_ace.py](get_ace.py) because of `https://feeds.dev.azure.com` API is used  
+[./cloud/get_feed_acl.py](./cloud/get_feed_acl.py) script is used instead of [./common/get_ace.py](./common/get_ace.py) because of `https://feeds.dev.azure.com` API is used  
 
-## Pipelines execution
-### Triggers
+# Pipelines execution
+## Triggers
 `create-project` pipeline is executed once, so no triggers needed  
 `check-project` pipeline must be executed on schedule, default is 2AM  
 Execution time is about 1 minute, so schedule can be set to be hourly  
 However there's still a risk that person will be added to 'Project Administrators' group, perform some "bad" actions, removed from the group and `check-project` pipeline will not catch it because all actions are less than 1h long  
 This is an advanced scenario and to address it real-time log analytics must be set to watch Azure DevOps logs  
 
-### Variables
+## Variables
 Both `create-project` and `check-project` pipelines must used the same variables in variable groups  
 Moreover, it's recommended not to change variables after `create-project` execution otherwise "current desired state" will not match "initial desired state"  
 Azure DevOps variable groups don't have history of changes and versioning so it's recommended to use [linking with Azure Key Vault](https://docs.microsoft.com/en-us/azure/devops/pipelines/library/variable-groups?view=azure-devops&tabs=yaml#link-secrets-from-an-azure-key-vault)  
@@ -310,8 +321,9 @@ If you want to add more groups or remove some of existing don't forget to change
 | pat | ***** |
 `*****` - because marked as secret
 
-### Azure DevOps specific syntax in scripts
-All Python scripts can be executed on any machine with Python 3 runtime, e.g. `python create_project.py --projectName 'test1' --pat 'a***q'`  
+## Azure DevOps specific syntax in scripts
+All Python scripts can be executed on any machine with Python 3 runtime, e.g. `python ./common/create_project.py --projectName 'test1' --pat 'a***q'`  
 However some Azure DevOps specific syntax is present in scripts:  
 1. All `print` functions have `[INFO]` or `[ERROR]` prefixes to make output more readable and properly [colored in Azure DevOps logs](https://developercommunity.visualstudio.com/content/problem/440605/write-host-foreground-color-with-powershell-task-i.html), [example](https://prnt.sc/rqzu2x)  
+However it is not supported in <span style="color:red">Azure DevOps Server v2019.Update1.1</span>  
 2. Environment variables are set via [`task.setvariable` logging command](https://docs.microsoft.com/en-us/azure/devops/pipelines/process/variables?view=azure-devops&tabs=yaml%2Cbatch#set-variables-in-scripts)  

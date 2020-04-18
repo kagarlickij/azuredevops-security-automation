@@ -6,7 +6,7 @@ import requests
 
 PARSER = argparse.ArgumentParser()
 
-PARSER.add_argument('--organization', type=str, default='kagarlickij')
+PARSER.add_argument('--organization', type=str)
 PARSER.add_argument('--namespaceId', type=str)
 PARSER.add_argument('--projectId', type=str)
 PARSER.add_argument('--groupName', type=str)
@@ -36,7 +36,7 @@ else:
 
 ACE = (os.environ[(ARGS.groupAce).upper()])
 
-URL = 'https://dev.azure.com/{}/_apis/accesscontrollists/{}?token={}&api-version=5.0'.format(ARGS.organization, ARGS.namespaceId, TOKEN)
+URL = '{}/_apis/accesscontrollists/{}?token={}&api-version=5.0'.format(ARGS.organization, ARGS.namespaceId, TOKEN)
 HEADERS = {
     'Content-Type': 'application/json',
 }
@@ -68,7 +68,7 @@ else:
 
     DESIRED_ACL = {'count': 1, 'value': [{'inheritPermissions': 'true', 'token': f'{TOKEN}', 'acesDictionary': ACCESS_DICT}]}
 
-    URL = 'https://dev.azure.com/{}/_apis/accesscontrollists/{}?api-version=5.0'.format(ARGS.organization, ARGS.namespaceId)
+    URL = '{}/_apis/accesscontrollists/{}?api-version=5.0'.format(ARGS.organization, ARGS.namespaceId)
     HEADERS = {
         'Content-Type': 'application/json',
     }
