@@ -320,6 +320,7 @@ If you want to add more groups or remove some of existing don't forget to change
 | ------------- | ------------- |
 | maxCommitAge | 15 |
 | maxPullRequestAge | 5 |
+| minApproverCount | 1 |
 
 `ados-secrets` group contains Personal Access Token that is used for all API actions, described in details above in "Personal vs System access token" section
 | Name | Value |

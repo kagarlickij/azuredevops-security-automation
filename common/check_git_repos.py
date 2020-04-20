@@ -11,11 +11,12 @@ PARSER.add_argument('--organization', type=str)
 PARSER.add_argument('--projectName', type=str)
 PARSER.add_argument('--maxCommitAge', type=str, default='30')
 PARSER.add_argument('--maxPullRequestAge', type=str, default='10')
+PARSER.add_argument('--minApproverCount', type=str)
 PARSER.add_argument('--pat', type=str)
 
 ARGS = PARSER.parse_args()
 
-if not ARGS.projectName or not ARGS.pat:
+if not ARGS.projectName or not ARGS.maxCommitAge or not ARGS.maxPullRequestAge or not ARGS.minApproverCount or not ARGS.pat:
     print(f'[ERROR] missing required arguments')
     sys.exit(1)
 
@@ -75,29 +76,11 @@ else:
                 UNKNOWN_BRANCHES = list()
                 OUTDATED_BRANCHES = list()
                 OUTDATED_PRS = list()
-                MASTER_POLICIES_QUANTITY = ''
 
                 for BRANCH in BRANCHES:
                     BRANCH_NAME = BRANCH['name']
                     BRANCH_SHORTNAME = BRANCH_NAME.replace('refs/heads/', '')
-                    if BRANCH_SHORTNAME == 'master':
-                        URL = '{}/{}/_apis/git/policy/configurations?REPO_ID={}&refName={}&api-version=5.0-preview.1'.format(ARGS.organization, ARGS.projectName, REPO_ID, BRANCH_NAME)
-                        try:
-                            RESPONSE = requests.get(URL, headers=HEADERS, auth=(ARGS.pat,''))
-                            RESPONSE.raise_for_status()
-                        except Exception as err:
-                            print(f'[ERROR] {err}')
-                            RESPONSE_TEXT = json.loads(RESPONSE.text)
-                            CODE = RESPONSE_TEXT['errorCode']
-                            MESSAGE = RESPONSE_TEXT['message']
-                            print(f'[ERROR] Response code: {CODE}')
-                            print(f'[ERROR] Response message: {MESSAGE}')
-                            sys.exit(1)
-                        else:
-                            POLICY_COUNTER = RESPONSE.json()['count']
-                            MASTER_POLICIES_QUANTITY = int(POLICY_COUNTER)
-
-                    elif ('feature/' in BRANCH_SHORTNAME or 'bugfix/' in BRANCH_SHORTNAME):
+                    if ('feature/' in BRANCH_SHORTNAME or 'bugfix/' in BRANCH_SHORTNAME):
                         URL = '{}/_apis/git/repositories/{}/commits?searchCriteria.itemVersion.version={}&api-version=5.0'.format(ARGS.organization, ARGS.projectName, BRANCH_SHORTNAME)
                         try:
                             RESPONSE = requests.get(URL, headers=HEADERS, auth=(ARGS.pat,''))
@@ -123,6 +106,9 @@ else:
                                 OUTDATED_BRANCHES.append(BRANCH_SHORTNAME)
                             else:
                                 pass
+
+                    elif BRANCH_SHORTNAME == 'master':
+                        pass
 
                     elif 'refs/tags/v' in BRANCH_NAME:
                         pass
@@ -176,11 +162,37 @@ else:
                 else:
                     print(f'##vso[task.logissue type=warning] Outdated Pull requests: {OUTDATED_PRS}')
 
-                if MASTER_POLICIES_QUANTITY != '':
-                    print(f'[INFO] master branch has {MASTER_POLICIES_QUANTITY} policy(es) assigned')
-                else:
-                    print(f'[ERROR] master branch does not have policies assigned')
-                    ERROR_COUNTER.append(REPO_ID)
 
-if len(ERROR_COUNTER) != 0:
+URL = '{}/{}/_apis/policy/configurations?api-version=5.1'.format(ARGS.organization, ARGS.projectName)
+HEADERS = {
+    'Content-Type': 'application/json',
+}
+
+try:
+    RESPONSE = requests.get(URL, headers=HEADERS, auth=(ARGS.pat,''))
+    RESPONSE.raise_for_status()
+except Exception as err:
+    print(f'[ERROR] {err}')
+    RESPONSE_TEXT = json.loads(RESPONSE.text)
+    CODE = RESPONSE_TEXT['errorCode']
+    MESSAGE = RESPONSE_TEXT['message']
+    print(f'[ERROR] Response code: {CODE}')
+    print(f'[ERROR] Response message: {MESSAGE}')
     sys.exit(1)
+else:
+    BRANCH_POLICY_COUNT = RESPONSE.json()['count']
+    if int(BRANCH_POLICY_COUNT) > 0:
+        MATCH_KIND = RESPONSE.json()['value'][0]['settings']['scope'][0]['matchKind']
+        REPO_ID = RESPONSE.json()['value'][0]['settings']['scope'][0]['repositoryId']
+        APPROVERS_COUNT = RESPONSE.json()['value'][0]['settings']['minimumApproverCount']
+        if MATCH_KIND == "DefaultBranch" and REPO_ID is None and APPROVERS_COUNT >= int(ARGS.minApproverCount):
+            print(f'[INFO] default branch has reviewers policy assigned, minimum number of reviewers is {APPROVERS_COUNT}')
+        else:
+            print(f'[ERROR] default branch does not have valid reviewers policy assigned')
+            print(f'[DEBUG] MATCH_KIND = {MATCH_KIND}')
+            print(f'[DEBUG] REPO_ID = {REPO_ID}')
+            print(f'[DEBUG] APPROVERS_COUNT = {APPROVERS_COUNT}')
+            sys.exit(1)
+    else:
+        print(f'[ERROR] default branch does not have policies assigned')
+        sys.exit(1)

@@ -169,6 +169,14 @@ jobs:
 
   - powershell: |
       sleep 1
+      python ./common/set_git_repos.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --projectName $(projectName) --minApproverCount $(minApproverCount) --pat $(onprem_pat)
+    displayName: 'Set Git repos settings'
+    env:
+      PROJECT_ID: $(projectId)
+
+
+  - powershell: |
+      sleep 1
       python ./common/set_ace.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --projectId $Env:PROJECT_ID --namespaceId '2e9eb7ed-3c0a-47d4-87c1-0ffdd275fd87' --groupName $(administrators-group-name) --groupAce $(administrators-group-ace) --allow $(administrators-git-allow-permissions) --deny $(administrators-git-deny-permissions) --pat $(onprem_pat)
     displayName: 'Set Git permissions for $(projectName)-administrators group'
     env:

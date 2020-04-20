@@ -230,7 +230,7 @@ jobs:
 
   - powershell: |
       sleep 1
-      python ./common/check_git_repos.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --projectName $(projectName) --maxCommitAge $(maxCommitAge) --maxPullRequestAge $(maxPullRequestAge) --pat $(onprem_pat)
+      python ./common/check_git_repos.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --projectName $(projectName) --maxCommitAge $(maxCommitAge) --maxPullRequestAge $(maxPullRequestAge) --minApproverCount $(minApproverCount) --pat $(onprem_pat)
     displayName: 'Check Git repos settings'
     continueOnError: true
 
