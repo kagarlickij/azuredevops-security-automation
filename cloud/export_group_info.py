@@ -6,7 +6,7 @@ import requests
 
 PARSER = argparse.ArgumentParser()
 
-PARSER.add_argument('--organization', type=str, default='kagarlickij')
+PARSER.add_argument('--organization', type=str)
 PARSER.add_argument('--projectScopeDescriptor', type=str)
 PARSER.add_argument('--groupName', type=str)
 PARSER.add_argument('--groupAce', type=str)
@@ -18,7 +18,7 @@ if not ARGS.projectScopeDescriptor or not ARGS.groupName or not ARGS.groupAce or
     print(f'[ERROR] missing required arguments')
     sys.exit(1)
 
-URL = 'https://vssps.dev.azure.com/{}/_apis/graph/groups?scopeDescriptor={}&api-version=5.0-preview.1'.format(ARGS.organization, ARGS.projectScopeDescriptor)
+URL = '{}/_apis/graph/groups?scopeDescriptor={}&api-version=5.0-preview.1'.format(ARGS.organization, ARGS.projectScopeDescriptor)
 HEADERS = {
     'Content-Type': 'application/json',
 }

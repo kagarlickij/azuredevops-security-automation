@@ -9,8 +9,8 @@ PARSER = argparse.ArgumentParser()
 
 PARSER.add_argument('--organization', type=str)
 PARSER.add_argument('--projectName', type=str)
-PARSER.add_argument('--maxCommitAge', type=str, default='30')
-PARSER.add_argument('--maxPullRequestAge', type=str, default='10')
+PARSER.add_argument('--maxCommitAge', type=str)
+PARSER.add_argument('--maxPullRequestAge', type=str)
 PARSER.add_argument('--minApproverCount', type=str)
 PARSER.add_argument('--pat', type=str)
 
@@ -185,7 +185,7 @@ else:
         MATCH_KIND = RESPONSE.json()['value'][0]['settings']['scope'][0]['matchKind']
         REPO_ID = RESPONSE.json()['value'][0]['settings']['scope'][0]['repositoryId']
         APPROVERS_COUNT = RESPONSE.json()['value'][0]['settings']['minimumApproverCount']
-        if MATCH_KIND == "DefaultBranch" and REPO_ID is None and APPROVERS_COUNT >= int(ARGS.minApproverCount):
+        if MATCH_KIND == "Exact" and REPO_ID is None and APPROVERS_COUNT >= int(ARGS.minApproverCount):
             print(f'[INFO] default branch has reviewers policy assigned, minimum number of reviewers is {APPROVERS_COUNT}')
         else:
             print(f'[ERROR] default branch does not have valid reviewers policy assigned')

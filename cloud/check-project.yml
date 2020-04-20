@@ -22,7 +22,7 @@ schedules:
 
 variables:
 - name: projectName
-  value: 'templ-test18'
+  value: 'templ-test21'
 
 - group: ados-group-names-templ-test01
 - group: ados-acls-templ-test01
@@ -44,14 +44,14 @@ jobs:
 
 
   - bash: |
-      python ./cloud/export_project_info.py --projectName $(projectName) --pat $(cloud_pat)
+      python ./cloud/export_project_info.py --organization 'kagarlickij' --projectName $(projectName) --pat $(cloud_pat)
     displayName: 'Export project-related info'
 
 
   - bash: |
       sleep 1
       # python ./cloud/get_groups.py --projectScopeDescriptor $PROJECT_SCOPE_DESCRIPTOR --desiredGroupsList '$(administrators-group-name)' '$(developers-group-name)' '$(auditors-group-name)' '$(product-owners-group-name)' '$(projectName) Team' 'Build Administrators' 'Release Administrators' 'Project Administrators' 'Readers' 'Contributors' 'Project Valid Users' --pat $(cloud_pat)
-      python ./cloud/get_groups.py --projectScopeDescriptor $PROJECT_SCOPE_DESCRIPTOR --desiredGroupsList '$(administrators-group-name)' '$(developers-group-name)' '$(auditors-group-name)' '$(product-owners-group-name)' '$(projectName) Team' 'Project Administrators' 'Project Valid Users' --pat $(cloud_pat)
+      python ./cloud/get_groups.py --organization 'https://vssps.dev.azure.com/kagarlickij' --projectScopeDescriptor $PROJECT_SCOPE_DESCRIPTOR --desiredGroupsList '$(administrators-group-name)' '$(developers-group-name)' '$(auditors-group-name)' '$(product-owners-group-name)' '$(projectName) Team' 'Project Administrators' 'Project Valid Users' --pat $(cloud_pat)
     displayName: 'Check list of groups'
     continueOnError: true
     env:
@@ -60,7 +60,7 @@ jobs:
 
   # - bash: |
   #     sleep 1
-  #     python ./cloud/get_group_members.py --projectScopeDescriptor $PROJECT_SCOPE_DESCRIPTOR --groupName 'Build Administrators' --desiredMembersQuantity '0' --pat $(cloud_pat)
+  #     python ./cloud/get_group_members.py --organization 'kagarlickij' --projectScopeDescriptor $PROJECT_SCOPE_DESCRIPTOR --groupName 'Build Administrators' --desiredMembersQuantity '0' --pat $(cloud_pat)
   #   displayName: 'Check Build Administrators group members'
   #   continueOnError: true
   #   env:
@@ -68,7 +68,7 @@ jobs:
 
   # - bash: |
   #     sleep 1
-  #     python ./cloud/get_group_members.py --projectScopeDescriptor $PROJECT_SCOPE_DESCRIPTOR --groupName 'Contributors' --desiredMembersQuantity '0' --pat $(cloud_pat)
+  #     python ./cloud/get_group_members.py --organization 'kagarlickij' --projectScopeDescriptor $PROJECT_SCOPE_DESCRIPTOR --groupName 'Contributors' --desiredMembersQuantity '0' --pat $(cloud_pat)
   #   displayName: 'Check Contributors group members'
   #   continueOnError: true
   #   env:
@@ -76,7 +76,7 @@ jobs:
 
   - bash: |
       sleep 1
-      python ./cloud/get_group_members.py --projectScopeDescriptor $PROJECT_SCOPE_DESCRIPTOR --groupName 'Project Administrators' --desiredMembersQuantity '1' --pat $(cloud_pat)
+      python ./cloud/get_group_members.py --organization 'kagarlickij' --projectScopeDescriptor $PROJECT_SCOPE_DESCRIPTOR --groupName 'Project Administrators' --desiredMembersQuantity '1' --pat $(cloud_pat)
     displayName: 'Check Project Administrators group members'
     continueOnError: true
     env:
@@ -84,7 +84,7 @@ jobs:
 
   - bash: |
       sleep 1
-      python ./cloud/get_group_members.py --projectScopeDescriptor $PROJECT_SCOPE_DESCRIPTOR --groupName 'Project Valid Users' --desiredMembersQuantity '0' --pat $(cloud_pat)
+      python ./cloud/get_group_members.py --organization 'kagarlickij' --projectScopeDescriptor $PROJECT_SCOPE_DESCRIPTOR --groupName 'Project Valid Users' --desiredMembersQuantity '0' --pat $(cloud_pat)
     displayName: 'Check Project Valid Users group members'
     continueOnError: true
     env:
@@ -92,7 +92,7 @@ jobs:
 
   # - bash: |
   #     sleep 1
-  #     python ./cloud/get_group_members.py --projectScopeDescriptor $PROJECT_SCOPE_DESCRIPTOR --groupName 'Readers' --desiredMembersQuantity '0' --pat $(cloud_pat)
+  #     python ./cloud/get_group_members.py --organization 'kagarlickij' --projectScopeDescriptor $PROJECT_SCOPE_DESCRIPTOR --groupName 'Readers' --desiredMembersQuantity '0' --pat $(cloud_pat)
   #   displayName: 'Check Readers group members'
   #   continueOnError: true
   #   env:
@@ -101,28 +101,28 @@ jobs:
 
   - bash: |
       sleep 1
-      python ./cloud/export_group_info.py --projectScopeDescriptor $PROJECT_SCOPE_DESCRIPTOR --groupName $(administrators-group-name) --groupAce $(administrators-group-ace) --pat $(cloud_pat)
+      python ./cloud/export_group_info.py --organization 'https://vssps.dev.azure.com/kagarlickij' --projectScopeDescriptor $PROJECT_SCOPE_DESCRIPTOR --groupName $(administrators-group-name) --groupAce $(administrators-group-ace) --pat $(cloud_pat)
     displayName: 'Export $(projectName)-administrators group info'
     env:
       PROJECT_SCOPE_DESCRIPTOR: $(projectScopeDescriptor)
 
   - bash: |
       sleep 1
-      python ./cloud/export_group_info.py --projectScopeDescriptor $PROJECT_SCOPE_DESCRIPTOR --groupName $(developers-group-name) --groupAce $(developers-group-ace) --pat $(cloud_pat)
+      python ./cloud/export_group_info.py --organization 'https://vssps.dev.azure.com/kagarlickij' --projectScopeDescriptor $PROJECT_SCOPE_DESCRIPTOR --groupName $(developers-group-name) --groupAce $(developers-group-ace) --pat $(cloud_pat)
     displayName: 'Export $(projectName)-developers group info'
     env:
       PROJECT_SCOPE_DESCRIPTOR: $(projectScopeDescriptor)
 
   - bash: |
       sleep 1
-      python ./cloud/export_group_info.py --projectScopeDescriptor $PROJECT_SCOPE_DESCRIPTOR --groupName $(auditors-group-name) --groupAce $(auditors-group-ace) --pat $(cloud_pat)
+      python ./cloud/export_group_info.py --organization 'https://vssps.dev.azure.com/kagarlickij' --projectScopeDescriptor $PROJECT_SCOPE_DESCRIPTOR --groupName $(auditors-group-name) --groupAce $(auditors-group-ace) --pat $(cloud_pat)
     displayName: 'Export $(projectName)-auditors group info'
     env:
       PROJECT_SCOPE_DESCRIPTOR: $(projectScopeDescriptor)
 
   - bash: |
       sleep 1
-      python ./cloud/export_group_info.py --projectScopeDescriptor $PROJECT_SCOPE_DESCRIPTOR --groupName $(product-owners-group-name) --groupAce $(product-owners-group-ace) --pat $(cloud_pat)
+      python ./cloud/export_group_info.py --organization 'https://vssps.dev.azure.com/kagarlickij' --projectScopeDescriptor $PROJECT_SCOPE_DESCRIPTOR --groupName $(product-owners-group-name) --groupAce $(product-owners-group-ace) --pat $(cloud_pat)
     displayName: 'Export $(projectName)-product-owners group info'
     env:
       PROJECT_SCOPE_DESCRIPTOR: $(projectScopeDescriptor)
@@ -340,7 +340,7 @@ jobs:
 
   - bash: |
       sleep 1
-      python ./common/get_feed_acl.py --projectName $(projectName) --groupName $(administrators-group-name) --groupAce $(administrators-group-ace) --feedId $FEED_ID --role $(administrators-feed-permissions) --pat $(cloud_pat)
+      python ./common/get_feed_acl.py --organization 'https://feeds.dev.azure.com/kagarlickij' --projectName $(projectName) --groupName $(administrators-group-name) --groupAce $(administrators-group-ace) --feedId $FEED_ID --role $(administrators-feed-permissions) --pat $(cloud_pat)
     displayName: 'Check Feed permissions for $(projectName)-administrators group'
     continueOnError: true
     env:
@@ -348,7 +348,7 @@ jobs:
 
   - bash: |
       sleep 1
-      python ./common/get_feed_acl.py --projectName $(projectName) --groupName $(developers-group-name) --groupAce $(developers-group-ace) --feedId $FEED_ID --role $(developers-feed-permissions) --pat $(cloud_pat)
+      python ./common/get_feed_acl.py --organization 'https://feeds.dev.azure.com/kagarlickij' --projectName $(projectName) --groupName $(developers-group-name) --groupAce $(developers-group-ace) --feedId $FEED_ID --role $(developers-feed-permissions) --pat $(cloud_pat)
     displayName: 'Check Feed permissions for $(projectName)-developers group'
     continueOnError: true
     env:
@@ -356,7 +356,7 @@ jobs:
 
   - bash: |
       sleep 1
-      python ./common/get_feed_acl.py --projectName $(projectName) --groupName $(auditors-group-name) --groupAce $(auditors-group-ace) --feedId $FEED_ID --role $(auditors-feed-permissions) --pat $(cloud_pat)
+      python ./common/get_feed_acl.py --organization 'https://feeds.dev.azure.com/kagarlickij' --projectName $(projectName) --groupName $(auditors-group-name) --groupAce $(auditors-group-ace) --feedId $FEED_ID --role $(auditors-feed-permissions) --pat $(cloud_pat)
     displayName: 'Check Feed permissions for $(projectName)-auditors group'
     continueOnError: true
     env:
@@ -364,7 +364,7 @@ jobs:
 
   - bash: |
       sleep 1
-      python ./common/get_feed_acl.py --projectName $(projectName) --groupName $(product-owners-group-name) --groupAce $(product-owners-group-ace) --feedId $FEED_ID --role $(product-owners-feed-permissions) --pat $(cloud_pat)
+      python ./common/get_feed_acl.py --organization 'https://feeds.dev.azure.com/kagarlickij' --projectName $(projectName) --groupName $(product-owners-group-name) --groupAce $(product-owners-group-ace) --feedId $FEED_ID --role $(product-owners-feed-permissions) --pat $(cloud_pat)
     displayName: 'Check Feed permissions for $(projectName)-product-owners group'
     continueOnError: true
     env:

@@ -5,7 +5,7 @@ import requests
 
 PARSER = argparse.ArgumentParser()
 
-PARSER.add_argument('--organization', type=str, default='kagarlickij')
+PARSER.add_argument('--organization', type=str)
 PARSER.add_argument('--projectScopeDescriptor', type=str)
 PARSER.add_argument('--groupName', type=str)
 PARSER.add_argument('--desiredMembersQuantity', type=str)

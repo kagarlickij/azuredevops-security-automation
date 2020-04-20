@@ -12,7 +12,7 @@ PARSER.add_argument('--pat', type=str)
 
 ARGS = PARSER.parse_args()
 
-if not ARGS.projectName or not ARGS.feedName or not ARGS.pat:
+if not ARGS.feedName or not ARGS.pat:
     print(f'[ERROR] missing required arguments')
     sys.exit(1)
 

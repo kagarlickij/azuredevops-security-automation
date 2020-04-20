@@ -6,7 +6,7 @@ import requests
 
 PARSER = argparse.ArgumentParser()
 
-PARSER.add_argument('--organization', type=str, default='kagarlickij')
+PARSER.add_argument('--organization', type=str)
 PARSER.add_argument('--feedId', type=str)
 PARSER.add_argument('--projectName', type=str)
 PARSER.add_argument('--groupName', type=str)
@@ -27,7 +27,7 @@ if not ARGS.projectName:
     URL = '{}/_apis/packaging/Feeds/{}/permissions?api-version=5.0-preview.1'.format(ARGS.organization, ARGS.feedId)
 else:
     print(f'[INFO] projectName received, so working with cloud API')
-    URL = 'https://feeds.dev.azure.com/{}/{}/_apis/packaging/Feeds/{}/permissions?api-version=5.0-preview.1'.format(ARGS.organization, ARGS.projectName, ARGS.feedId)
+    URL = '{}/{}/_apis/packaging/Feeds/{}/permissions?api-version=5.0-preview.1'.format(ARGS.organization, ARGS.projectName, ARGS.feedId)
 
 HEADERS = {
     'Content-Type': 'application/json',

@@ -33,8 +33,8 @@ DATA = {
         'creatorVoteCounts': 'false',
         'scope': [
             {
-                'refName': null,
-                'matchKind': 'DefaultBranch',
+                'refName': 'refs/heads/master',
+                'matchKind': 'exact',
                 'repositoryId': null
             }
         ]

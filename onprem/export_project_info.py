@@ -5,7 +5,7 @@ import requests
 
 PARSER = argparse.ArgumentParser()
 
-PARSER.add_argument('--organization', type=str, default='https://ados.demo.kagarlickij.com/DefaultCollection')
+PARSER.add_argument('--organization', type=str)
 PARSER.add_argument('--projectName', type=str)
 PARSER.add_argument('--pat', type=str)
 
