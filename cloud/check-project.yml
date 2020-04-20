@@ -22,7 +22,7 @@ schedules:
 
 variables:
 - name: projectName
-  value: 'templ-test11'
+  value: 'templ-test14'
 
 - group: ados-group-names-templ-test01
 - group: ados-acls-templ-test01
@@ -196,6 +196,46 @@ jobs:
 
   - bash: |
       sleep 1
+      python ./common/get_ace.py --organization 'https://dev.azure.com/kagarlickij' --projectId $PROJECT_ID --namespaceId 'b7e84409-6553-448a-bbb2-af228e07cbeb' --groupName $(administrators-group-name) --groupAce $(administrators-group-ace) --allow $(administrators-library-allow-permissions) --deny $(administrators-library-deny-permissions) --pat $(cloud_pat)
+    displayName: 'Check Library permissions for $(projectName)-administrators group'
+    continueOnError: true
+    env:
+      PROJECT_ID: $(projectId)
+
+  - bash: |
+      sleep 1
+      python ./common/get_ace.py --organization 'https://dev.azure.com/kagarlickij' --projectId $PROJECT_ID --namespaceId 'b7e84409-6553-448a-bbb2-af228e07cbeb' --groupName $(developers-group-name) --groupAce $(developers-group-ace) --allow $(developers-library-allow-permissions) --deny $(developers-library-deny-permissions) --pat $(cloud_pat)
+    displayName: 'Check Library permissions for $(projectName)-developers group'
+    continueOnError: true
+    env:
+      PROJECT_ID: $(projectId)
+
+  - bash: |
+      sleep 1
+      python ./common/get_ace.py --organization 'https://dev.azure.com/kagarlickij' --projectId $PROJECT_ID --namespaceId 'b7e84409-6553-448a-bbb2-af228e07cbeb' --groupName $(auditors-group-name) --groupAce $(auditors-group-ace) --allow $(auditors-library-allow-permissions) --deny $(auditors-library-deny-permissions) --pat $(cloud_pat)
+    displayName: 'Check Library permissions for $(projectName)-auditors group'
+    continueOnError: true
+    env:
+      PROJECT_ID: $(projectId)
+
+  - bash: |
+      sleep 1
+      python ./common/get_ace.py --organization 'https://dev.azure.com/kagarlickij' --projectId $PROJECT_ID --namespaceId 'b7e84409-6553-448a-bbb2-af228e07cbeb' --groupName $(product-owners-group-name) --groupAce $(product-owners-group-ace) --allow $(product-owners-library-allow-permissions) --deny $(product-owners-library-deny-permissions) --pat $(cloud_pat)
+    displayName: 'Check Library permissions for $(projectName)-product-owners group'
+    continueOnError: true
+    env:
+      PROJECT_ID: $(projectId)
+
+
+  - bash: |
+      sleep 1
+      python ./common/check_git_repos.py --organization 'https://dev.azure.com/kagarlickij' --projectName $(projectName) --maxCommitAge $(maxCommitAge) --maxPullRequestAge $(maxPullRequestAge) --minApproverCount $(minApproverCount) --pat $(cloud_pat)
+    displayName: 'Check Git repos settings'
+    continueOnError: true
+
+
+  - bash: |
+      sleep 1
       python ./common/get_ace.py --organization 'https://dev.azure.com/kagarlickij' --projectId $PROJECT_ID --namespaceId '2e9eb7ed-3c0a-47d4-87c1-0ffdd275fd87' --groupName $(administrators-group-name) --groupAce $(administrators-group-ace) --allow $(administrators-git-allow-permissions) --deny $(administrators-git-deny-permissions) --pat $(cloud_pat)
     displayName: 'Check Git permissions for $(projectName)-administrators group'
     continueOnError: true
@@ -225,13 +265,6 @@ jobs:
     continueOnError: true
     env:
       PROJECT_ID: $(projectId)
-
-
-  - bash: |
-      sleep 1
-      python ./common/check_git_repos.py --organization 'https://dev.azure.com/kagarlickij' --projectName $(projectName) --maxCommitAge $(maxCommitAge) --maxPullRequestAge $(maxPullRequestAge) --minApproverCount $(minApproverCount) --pat $(cloud_pat)
-    displayName: 'Check Git repos settings'
-    continueOnError: true
 
 
   - bash: |
