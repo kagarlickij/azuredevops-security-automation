@@ -22,7 +22,7 @@ schedules:
 
 variables:
 - name: projectName
-  value: 'templ-test14'
+  value: 'templ-test18'
 
 - group: ados-group-names-templ-test01
 - group: ados-acls-templ-test01
@@ -334,13 +334,13 @@ jobs:
 
 
   - bash: |
-      python ./cloud/export_feed_info.py --feedName $(projectName) --pat $(cloud_pat)
+      python ./common/export_feed_info.py --organization 'https://feeds.dev.azure.com/kagarlickij' --feedName $(projectName) --pat $(cloud_pat)
     displayName: 'Export feed-related info'
 
 
   - bash: |
       sleep 1
-      python ./cloud/get_feed_acl.py --projectName $(projectName) --groupName $(administrators-group-name) --groupAce $(administrators-group-ace) --feedId $FEED_ID --role $(administrators-feed-permissions) --pat $(cloud_pat)
+      python ./common/get_feed_acl.py --projectName $(projectName) --groupName $(administrators-group-name) --groupAce $(administrators-group-ace) --feedId $FEED_ID --role $(administrators-feed-permissions) --pat $(cloud_pat)
     displayName: 'Check Feed permissions for $(projectName)-administrators group'
     continueOnError: true
     env:
@@ -348,7 +348,7 @@ jobs:
 
   - bash: |
       sleep 1
-      python ./cloud/get_feed_acl.py --projectName $(projectName) --groupName $(developers-group-name) --groupAce $(developers-group-ace) --feedId $FEED_ID --role $(developers-feed-permissions) --pat $(cloud_pat)
+      python ./common/get_feed_acl.py --projectName $(projectName) --groupName $(developers-group-name) --groupAce $(developers-group-ace) --feedId $FEED_ID --role $(developers-feed-permissions) --pat $(cloud_pat)
     displayName: 'Check Feed permissions for $(projectName)-developers group'
     continueOnError: true
     env:
@@ -356,7 +356,7 @@ jobs:
 
   - bash: |
       sleep 1
-      python ./cloud/get_feed_acl.py --projectName $(projectName) --groupName $(auditors-group-name) --groupAce $(auditors-group-ace) --feedId $FEED_ID --role $(auditors-feed-permissions) --pat $(cloud_pat)
+      python ./common/get_feed_acl.py --projectName $(projectName) --groupName $(auditors-group-name) --groupAce $(auditors-group-ace) --feedId $FEED_ID --role $(auditors-feed-permissions) --pat $(cloud_pat)
     displayName: 'Check Feed permissions for $(projectName)-auditors group'
     continueOnError: true
     env:
@@ -364,7 +364,7 @@ jobs:
 
   - bash: |
       sleep 1
-      python ./cloud/get_feed_acl.py --projectName $(projectName) --groupName $(product-owners-group-name) --groupAce $(product-owners-group-ace) --feedId $FEED_ID --role $(product-owners-feed-permissions) --pat $(cloud_pat)
+      python ./common/get_feed_acl.py --projectName $(projectName) --groupName $(product-owners-group-name) --groupAce $(product-owners-group-ace) --feedId $FEED_ID --role $(product-owners-feed-permissions) --pat $(cloud_pat)
     displayName: 'Check Feed permissions for $(projectName)-product-owners group'
     continueOnError: true
     env:

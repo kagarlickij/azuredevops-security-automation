@@ -15,7 +15,7 @@ pr:
 
 variables:
 - name: projectName
-  value: 'templ-test14'
+  value: 'templ-test18'
 
 - group: ados-group-names-templ-test01
 - group: ados-acls-templ-test01
@@ -353,7 +353,7 @@ jobs:
 
   - bash: |
       sleep 1
-      python ./cloud/create_feed.py --projectName $(projectName) --feedName $(projectName) --pat $(cloud_pat)
+      python ./common/create_feed.py --organization 'https://feeds.dev.azure.com/kagarlickij' --projectName $(projectName) --feedName $(projectName) --pat $(cloud_pat)
     displayName: 'Create Artifact feed'
 
 
@@ -363,34 +363,34 @@ jobs:
 
 
   - bash: |
-      python ./cloud/export_feed_info.py --feedName $(projectName) --pat $(cloud_pat)
+      python ./common/export_feed_info.py --organization 'https://feeds.dev.azure.com/kagarlickij' --feedName $(projectName) --pat $(cloud_pat)
     displayName: 'Export feed-related info'
 
 
   - bash: |
       sleep 1
-      python ./cloud/set_feed_acl.py --projectName $(projectName) --groupName $(administrators-group-name) --groupAce $(administrators-group-ace) --feedId $FEED_ID --role $(administrators-feed-permissions) --pat $(cloud_pat)
+      python ./common/set_feed_acl.py --projectName $(projectName) --groupName $(administrators-group-name) --groupAce $(administrators-group-ace) --feedId $FEED_ID --role $(administrators-feed-permissions) --pat $(cloud_pat)
     displayName: 'Set Feed permissions for $(projectName)-administrators group'
     env:
       FEED_ID: $(feedId)
 
   - bash: |
       sleep 1
-      python ./cloud/set_feed_acl.py --projectName $(projectName) --groupName $(developers-group-name) --groupAce $(developers-group-ace) --feedId $FEED_ID --role $(developers-feed-permissions) --pat $(cloud_pat)
+      python ./common/set_feed_acl.py --projectName $(projectName) --groupName $(developers-group-name) --groupAce $(developers-group-ace) --feedId $FEED_ID --role $(developers-feed-permissions) --pat $(cloud_pat)
     displayName: 'Set Feed permissions for $(projectName)-developers group'
     env:
       FEED_ID: $(feedId)
 
   - bash: |
       sleep 1
-      python ./cloud/set_feed_acl.py --projectName $(projectName) --groupName $(auditors-group-name) --groupAce $(auditors-group-ace) --feedId $FEED_ID --role $(auditors-feed-permissions) --pat $(cloud_pat)
+      python ./common/set_feed_acl.py --projectName $(projectName) --groupName $(auditors-group-name) --groupAce $(auditors-group-ace) --feedId $FEED_ID --role $(auditors-feed-permissions) --pat $(cloud_pat)
     displayName: 'Set Feed permissions for $(projectName)-auditors group'
     env:
       FEED_ID: $(feedId)
 
   - bash: |
       sleep 1
-      python ./cloud/set_feed_acl.py --projectName $(projectName) --groupName $(product-owners-group-name) --groupAce $(product-owners-group-ace) --feedId $FEED_ID --role $(product-owners-feed-permissions) --pat $(cloud_pat)
+      python ./common/set_feed_acl.py --projectName $(projectName) --groupName $(product-owners-group-name) --groupAce $(product-owners-group-ace) --feedId $FEED_ID --role $(product-owners-feed-permissions) --pat $(cloud_pat)
     displayName: 'Set Feed permissions for $(projectName)-product-owners group'
     env:
       FEED_ID: $(feedId)

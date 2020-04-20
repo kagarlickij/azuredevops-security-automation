@@ -15,7 +15,7 @@ pr:
 
 variables:
 - name: projectName
-  value: 'templ-test06'
+  value: 'templ-test07'
 
 - group: ados-group-names-templ-test01
 - group: ados-acls-templ-test01
@@ -303,7 +303,7 @@ jobs:
 
   - powershell: |
       sleep 1
-      python ./onprem/create_feed.py --feedName $(projectName) --pat $(onprem_pat)
+      python ./common/create_feed.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --projectName $(projectName) --feedName $(projectName) --pat $(onprem_pat)
     displayName: 'Create Artifact feed'
 
 
@@ -313,34 +313,34 @@ jobs:
 
 
   - powershell: |
-      python ./onprem/export_feed_info.py --feedName $(projectName) --pat $(onprem_pat)
+      python ./common/export_feed_info.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --feedName $(projectName) --pat $(onprem_pat)
     displayName: 'Export feed-related info'
 
 
   - powershell: |
       sleep 1
-      python ./onprem/set_feed_acl.py --groupName $(administrators-group-name) --groupAce $(administrators-group-ace) --feedId $Env:FEED_ID --role $(administrators-feed-permissions) --pat $(onprem_pat)
+      python ./common/set_feed_acl.py --groupName $(administrators-group-name) --groupAce $(administrators-group-ace) --feedId $Env:FEED_ID --role $(administrators-feed-permissions) --pat $(onprem_pat)
     displayName: 'Set Feed permissions for $(projectName)-administrators group'
     env:
       FEED_ID: $(feedId)
 
   - powershell: |
       sleep 1
-      python ./onprem/set_feed_acl.py --groupName $(developers-group-name) --groupAce $(developers-group-ace) --feedId $Env:FEED_ID --role $(developers-feed-permissions) --pat $(onprem_pat)
+      python ./common/set_feed_acl.py --groupName $(developers-group-name) --groupAce $(developers-group-ace) --feedId $Env:FEED_ID --role $(developers-feed-permissions) --pat $(onprem_pat)
     displayName: 'Set Feed permissions for $(projectName)-developers group'
     env:
       FEED_ID: $(feedId)
 
   - powershell: |
       sleep 1
-      python ./onprem/set_feed_acl.py --groupName $(auditors-group-name) --groupAce $(auditors-group-ace) --feedId $Env:FEED_ID --role $(auditors-feed-permissions) --pat $(onprem_pat)
+      python ./common/set_feed_acl.py --groupName $(auditors-group-name) --groupAce $(auditors-group-ace) --feedId $Env:FEED_ID --role $(auditors-feed-permissions) --pat $(onprem_pat)
     displayName: 'Set Feed permissions for $(projectName)-auditors group'
     env:
       FEED_ID: $(feedId)
 
   - powershell: |
       sleep 1
-      python ./onprem/set_feed_acl.py --groupName $(product-owners-group-name) --groupAce $(product-owners-group-ace) --feedId $Env:FEED_ID --role $(product-owners-feed-permissions) --pat $(onprem_pat)
+      python ./common/set_feed_acl.py --groupName $(product-owners-group-name) --groupAce $(product-owners-group-ace) --feedId $Env:FEED_ID --role $(product-owners-feed-permissions) --pat $(onprem_pat)
     displayName: 'Set Feed permissions for $(projectName)-product-owners group'
     env:
       FEED_ID: $(feedId)

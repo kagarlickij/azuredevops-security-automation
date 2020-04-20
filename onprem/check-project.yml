@@ -22,7 +22,7 @@ schedules:
 
 variables:
 - name: projectName
-  value: 'templ-test06'
+  value: 'templ-test07'
 
 - group: ados-group-names-templ-test01
 - group: ados-acls-templ-test01
@@ -339,13 +339,13 @@ jobs:
 
 
   - powershell: |
-      python ./onprem/export_feed_info.py --feedName $(projectName) --pat $(onprem_pat)
+      python ./common/export_feed_info.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --feedName $(projectName) --pat $(onprem_pat)
     displayName: 'Export feed-related info'
 
 
   - powershell: |
       sleep 1
-      python ./onprem/get_feed_acl.py --groupName $(administrators-group-name) --groupAce $(administrators-group-ace) --feedId $Env:FEED_ID --role $(administrators-feed-permissions) --pat $(onprem_pat)
+      python ./common/get_feed_acl.py --groupName $(administrators-group-name) --groupAce $(administrators-group-ace) --feedId $Env:FEED_ID --role $(administrators-feed-permissions) --pat $(onprem_pat)
     displayName: 'Check Feed permissions for $(projectName)-administrators group'
     continueOnError: true
     env:
@@ -353,7 +353,7 @@ jobs:
 
   - powershell: |
       sleep 1
-      python ./onprem/get_feed_acl.py --groupName $(developers-group-name) --groupAce $(developers-group-ace) --feedId $Env:FEED_ID --role $(developers-feed-permissions) --pat $(onprem_pat)
+      python ./common/get_feed_acl.py --groupName $(developers-group-name) --groupAce $(developers-group-ace) --feedId $Env:FEED_ID --role $(developers-feed-permissions) --pat $(onprem_pat)
     displayName: 'Check Feed permissions for $(projectName)-developers group'
     continueOnError: true
     env:
@@ -361,7 +361,7 @@ jobs:
 
   - powershell: |
       sleep 1
-      python ./onprem/get_feed_acl.py --groupName $(auditors-group-name) --groupAce $(auditors-group-ace) --feedId $Env:FEED_ID --role $(auditors-feed-permissions) --pat $(onprem_pat)
+      python ./common/get_feed_acl.py --groupName $(auditors-group-name) --groupAce $(auditors-group-ace) --feedId $Env:FEED_ID --role $(auditors-feed-permissions) --pat $(onprem_pat)
     displayName: 'Check Feed permissions for $(projectName)-auditors group'
     continueOnError: true
     env:
@@ -369,7 +369,7 @@ jobs:
 
   - powershell: |
       sleep 1
-      python ./onprem/get_feed_acl.py --groupName $(product-owners-group-name) --groupAce $(product-owners-group-ace) --feedId $Env:FEED_ID --role $(product-owners-feed-permissions) --pat $(onprem_pat)
+      python ./common/get_feed_acl.py --groupName $(product-owners-group-name) --groupAce $(product-owners-group-ace) --feedId $Env:FEED_ID --role $(product-owners-feed-permissions) --pat $(onprem_pat)
     displayName: 'Check Feed permissions for $(projectName)-product-owners group'
     continueOnError: true
     env:

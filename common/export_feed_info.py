@@ -5,7 +5,7 @@ import requests
 
 PARSER = argparse.ArgumentParser()
 
-PARSER.add_argument('--organization', type=str, default='https://ados.demo.kagarlickij.com/DefaultCollection')
+PARSER.add_argument('--organization', type=str)
 PARSER.add_argument('--feedName', type=str)
 PARSER.add_argument('--pat', type=str)
 
@@ -16,6 +16,7 @@ if not ARGS.feedName or not ARGS.pat:
     sys.exit(1)
 
 URL = '{}/_apis/packaging/feeds?api-version=5.0-preview.1'.format(ARGS.organization)
+
 HEADERS = {
     'Content-Type': 'application/json',
 }

@@ -6,8 +6,9 @@ import requests
 
 PARSER = argparse.ArgumentParser()
 
-PARSER.add_argument('--organization', type=str, default='https://ados.demo.kagarlickij.com/DefaultCollection')
+PARSER.add_argument('--organization', type=str, default='kagarlickij')
 PARSER.add_argument('--feedId', type=str)
+PARSER.add_argument('--projectName', type=str)
 PARSER.add_argument('--groupName', type=str)
 PARSER.add_argument('--groupAce', type=str)
 PARSER.add_argument('--role', type=str)
@@ -21,7 +22,13 @@ if not ARGS.feedId or not ARGS.groupName or not ARGS.groupAce or not ARGS.role o
 
 ACE = (os.environ[(ARGS.groupAce).upper()])
 
-URL = '{}/_apis/packaging/Feeds/{}/permissions?api-version=5.0-preview.1'.format(ARGS.organization, ARGS.feedId)
+if not ARGS.projectName:
+    print(f'[INFO] no projectName received, so working with on-prem API')
+    URL = '{}/_apis/packaging/Feeds/{}/permissions?api-version=5.0-preview.1'.format(ARGS.organization, ARGS.feedId)
+else:
+    print(f'[INFO] projectName received, so working with cloud API')
+    URL = 'https://feeds.dev.azure.com/{}/{}/_apis/packaging/Feeds/{}/permissions?api-version=5.0-preview.1'.format(ARGS.organization, ARGS.projectName, ARGS.feedId)
+
 HEADERS = {
     'Content-Type': 'application/json',
 }
@@ -49,11 +56,6 @@ else:
     }
 
     DESIRED_ACL = [NEW_ACE]
-
-    URL = '{}/_apis/packaging/Feeds/{}/permissions?api-version=5.0-preview.1'.format(ARGS.organization, ARGS.feedId)
-    HEADERS = {
-        'Content-Type': 'application/json',
-    }
 
     print(f'[INFO] Setting permissions for {ARGS.groupName} group..')
     try:

@@ -5,18 +5,24 @@ import requests
 
 PARSER = argparse.ArgumentParser()
 
-PARSER.add_argument('--organization', type=str, default='https://ados.demo.kagarlickij.com/DefaultCollection')
+PARSER.add_argument('--organization', type=str)
+PARSER.add_argument('--projectName', type=str)
 PARSER.add_argument('--feedName', type=str)
 PARSER.add_argument('--pat', type=str)
 
 ARGS = PARSER.parse_args()
 
-if not ARGS.feedName or not ARGS.pat:
+if not ARGS.projectName or not ARGS.feedName or not ARGS.pat:
     print(f'[ERROR] missing required arguments')
     sys.exit(1)
 
-print(f'[INFO] Creating {ARGS.feedName} feed..')
-URL = '{}/_apis/packaging/feeds?api-version=5.0-preview.1'.format(ARGS.organization)
+if not ARGS.projectName:
+    print(f'[INFO] no projectName received, so working with on-prem API')
+    URL = '{}/_apis/packaging/feeds?api-version=5.0-preview.1'.format(ARGS.organization)
+else:
+    print(f'[INFO] projectName received, so working with cloud API')
+    URL = '{}/{}/_apis/packaging/feeds?api-version=5.0-preview.1'.format(ARGS.organization, ARGS.projectName)
+
 HEADERS = {
     'Content-Type': 'application/json',
 }
@@ -27,6 +33,7 @@ DATA = {
     'capabilities': 'defaultCapabilities'
 }
 
+print(f'[INFO] Creating {ARGS.feedName} feed..')
 try:
     RESPONSE = requests.post(URL, headers=HEADERS, data=json.dumps(DATA), auth=(ARGS.pat,''))
     RESPONSE.raise_for_status()
