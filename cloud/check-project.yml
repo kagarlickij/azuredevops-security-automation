@@ -6,8 +6,12 @@ trigger:
   batch: true
   branches:
     exclude:
-    - 'master'
-    - 'on-prem'
+    - '*'
+
+pr:
+  branches:
+    exclude:
+    - '*'
 
 schedules:
 - cron: "0 2 * * *"
