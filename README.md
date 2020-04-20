@@ -220,8 +220,8 @@ As well as [./common/set_ace.py](./common/set_ace.py) [./common/get_ace.py](./co
 
 8. Check Git repos settings [task](./cloud/check_git_repos.py) performs the following checks on all repos in the project:  
 Check if all branches follow naming standards: allowed names are `master`, `feature/` and `bugfix/`  
-Check if all branches are up to date: latest commit shouldn't be older than 30 days, however `master` branch is excluded from this check  
-Check if all Pull requests are up to date: pull requests shouldn't be older than 10 days  
+Check if all branches are up to date: latest commit shouldn't be older than X days (see `ados-git-params-$projectName` below for details), however `master` branch is excluded from this check  
+Check if all Pull requests are up to date: pull requests shouldn't be older than X days (see `ados-git-params-$projectName` below for details)  
 All 3 checks generate warnings, not errors  
 The latest one checks if `master` branch has at least one policy assigned, and if now, error will be raised  
 Some repos can be excluded from checking by putting name to [excluded_repos.txt](excluded_repos.txt) file  
@@ -314,6 +314,12 @@ If you want to add more groups or remove some of existing don't forget to change
 | product-owners-project-deny-permissions | 4266494 |
 | product-owners-release-allow-permissions | 2169 |
 | product-owners-release-deny-permissions | 1926 |
+
+`ados-git-params-$projectName` group contains parameters for git checks, example:
+| Name | Value |
+| ------------- | ------------- |
+| maxCommitAge | 15 |
+| maxPullRequestAge | 5 |
 
 `ados-secrets` group contains Personal Access Token that is used for all API actions, described in details above in "Personal vs System access token" section
 | Name | Value |

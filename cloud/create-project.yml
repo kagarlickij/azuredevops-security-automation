@@ -11,10 +11,11 @@ trigger:
 
 variables:
 - name: projectName
-  value: 'templ-test06'
+  value: 'templ-test07'
 
 - group: ados-group-names-templ-test01
 - group: ados-acls-templ-test01
+- group: ados-git-params-templ-test01
 - group: ados-secrets
 
 jobs:

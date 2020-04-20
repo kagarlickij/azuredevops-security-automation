@@ -18,10 +18,11 @@ schedules:
 
 variables:
 - name: projectName
-  value: 'templ-test06'
+  value: 'templ-test07'
 
 - group: ados-group-names-templ-test01
 - group: ados-acls-templ-test01
+- group: ados-git-params-templ-test01
 - group: ados-secrets
 
 jobs:
@@ -224,7 +225,7 @@ jobs:
 
   - bash: |
       sleep 1
-      python ./common/check_git_repos.py --organization 'https://dev.azure.com/kagarlickij' --projectName $(projectName) --pat $(cloud_pat)
+      python ./common/check_git_repos.py --organization 'https://dev.azure.com/kagarlickij' --projectName $(projectName) --maxCommitAge $(maxCommitAge) --maxPullRequestAge $(maxPullRequestAge) --pat $(cloud_pat)
     displayName: 'Check Git repos settings'
     continueOnError: true
 

@@ -9,6 +9,8 @@ PARSER = argparse.ArgumentParser()
 
 PARSER.add_argument('--organization', type=str)
 PARSER.add_argument('--projectName', type=str)
+PARSER.add_argument('--maxCommitAge', type=str, default='30')
+PARSER.add_argument('--maxPullRequestAge', type=str, default='10')
 PARSER.add_argument('--pat', type=str)
 
 ARGS = PARSER.parse_args()
@@ -116,7 +118,7 @@ else:
                             CURRENT_DATE = date.today().strftime('%Y-%m-%d')
                             CURRENT_DATE_TIME = datetime.strptime(CURRENT_DATE, date_format)
                             LATEST_COMMIT_AGE = CURRENT_DATE_TIME - LATEST_COMMIT_SHORT_DATE_TIME
-                            if int(LATEST_COMMIT_AGE.days) > 10:
+                            if int(LATEST_COMMIT_AGE.days) > int(ARGS.maxCommitAge):
                                 print(f'[ERROR] Latest commit {LATEST_COMMIT_ID} is too old: {LATEST_COMMIT_AGE.days} day(s)')
                                 OUTDATED_BRANCHES.append(BRANCH_SHORTNAME)
                             else:
@@ -154,7 +156,7 @@ else:
                         CURRENT_DATE = date.today().strftime('%Y-%m-%d')
                         CURRENT_DATE_TIME = datetime.strptime(CURRENT_DATE, date_format)
                         PR_AGE = CURRENT_DATE_TIME - PR_SHORT_DATE_TIME
-                        if int(PR_AGE.days) > 10:
+                        if int(PR_AGE.days) > int(ARGS.maxPullRequestAge):
                             OUTDATED_PRS.append(PR_ID)
                         else:
                             pass
