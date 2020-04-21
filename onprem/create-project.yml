@@ -15,7 +15,7 @@ pr:
 
 variables:
 - name: projectName
-  value: 'templ-test10'
+  value: 'templ-test14'
 
 - group: ados-group-names-templ-test01
 - group: ados-acls-templ-test01
@@ -53,6 +53,35 @@ jobs:
       sleep 1
       python ./common/create_tmp_release_pipeline.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --projectName $(projectName) --pat $(onprem_pat)
     displayName: 'Create tmp Release pipeline'
+
+
+  - powershell: |
+      sleep 1
+      ./onprem/delete_group.ps1 -ORGANIZATION 'https://ados.demo.kagarlickij.com/DefaultCollection' -PROJECT_NAME $(projectName) -GROUP_NAME 'Readers'
+    displayName: 'Delete built-in Readers group'
+    env:
+      PROJECT_SCOPE_DESCRIPTOR: $(projectScopeDescriptor)
+
+  - powershell: |
+      sleep 1
+      ./onprem/delete_group.ps1 -ORGANIZATION 'https://ados.demo.kagarlickij.com/DefaultCollection' -PROJECT_NAME $(projectName) -GROUP_NAME 'Release Administrators'
+    displayName: 'Delete built-in Release Administrators group'
+    env:
+      PROJECT_SCOPE_DESCRIPTOR: $(projectScopeDescriptor)
+
+  - powershell: |
+      sleep 1
+      ./onprem/delete_group.ps1 -ORGANIZATION 'https://ados.demo.kagarlickij.com/DefaultCollection' -PROJECT_NAME $(projectName) -GROUP_NAME 'Build Administrators'
+    displayName: 'Delete built-in Build Administrators group'
+    env:
+      PROJECT_SCOPE_DESCRIPTOR: $(projectScopeDescriptor)
+
+  - powershell: |
+      sleep 1
+      ./onprem/delete_group.ps1 -ORGANIZATION 'https://ados.demo.kagarlickij.com/DefaultCollection' -PROJECT_NAME $(projectName) -GROUP_NAME 'Contributors'
+    displayName: 'Delete built-in Contributors group'
+    env:
+      PROJECT_SCOPE_DESCRIPTOR: $(projectScopeDescriptor)
 
 
   - powershell: |

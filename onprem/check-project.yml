@@ -22,7 +22,7 @@ schedules:
 
 variables:
 - name: projectName
-  value: 'templ-test10'
+  value: 'templ-test14'
 
 - group: ados-group-names-templ-test01
 - group: ados-acls-templ-test01
@@ -57,7 +57,7 @@ jobs:
 
   - powershell: |
       sleep 1
-      python ./onprem/get_groups.py --desiredGroupsList '$(administrators-group-name)' '$(developers-group-name)' '$(auditors-group-name)' '$(product-owners-group-name)' '$(projectName) Team' 'Build Administrators' 'Contributors' 'Project Administrators' 'Project Valid Users' 'Readers' 'Release Administrators'
+      python ./onprem/get_groups.py --desiredGroupsList '$(administrators-group-name)' '$(developers-group-name)' '$(auditors-group-name)' '$(product-owners-group-name)' '$(projectName) Team' 'Project Administrators' 'Project Valid Users'
     displayName: 'Check list of groups'
 
 
@@ -84,26 +84,6 @@ jobs:
 
   - powershell: |
       sleep 1
-      ./onprem/get_group_members.ps1 -ORGANIZATION 'https://ados.demo.kagarlickij.com/DefaultCollection' -PROJECT_NAME $(projectName) -GROUP_NAME 'Build Administrators'
-    displayName: 'Get Build Administrators group members'
-
-  - powershell: |
-      sleep 1
-      python ./onprem/get_group_members.py --groupName 'Build Administrators' --desiredMembersQuantity '0'
-    displayName: 'Check Build Administrators group members'
-
-  - powershell: |
-      sleep 1
-      ./onprem/get_group_members.ps1 -ORGANIZATION 'https://ados.demo.kagarlickij.com/DefaultCollection' -PROJECT_NAME $(projectName) -GROUP_NAME 'Contributors'
-    displayName: 'Get Contributors group members'
-
-  - powershell: |
-      sleep 1
-      python ./onprem/get_group_members.py --groupName 'Contributors' --desiredMembersQuantity '2'
-    displayName: 'Check Contributors group members'
-
-  - powershell: |
-      sleep 1
       ./onprem/get_group_members.ps1 -ORGANIZATION 'https://ados.demo.kagarlickij.com/DefaultCollection' -PROJECT_NAME $(projectName) -GROUP_NAME 'Project Administrators'
     displayName: 'Get Project Administrators group members'
 
@@ -119,18 +99,8 @@ jobs:
 
   - powershell: |
       sleep 1
-      python ./onprem/get_group_members.py --groupName 'Project Valid Users' --desiredMembersQuantity '11'
+      python ./onprem/get_group_members.py --groupName 'Project Valid Users' --desiredMembersQuantity '7'
     displayName: 'Check Project Valid Users group members'
-
-  - powershell: |
-      sleep 1
-      ./onprem/get_group_members.ps1 -ORGANIZATION 'https://ados.demo.kagarlickij.com/DefaultCollection' -PROJECT_NAME $(projectName) -GROUP_NAME 'Readers'
-    displayName: 'Get Readers group members'
-
-  - powershell: |
-      sleep 1
-      python ./onprem/get_group_members.py --groupName 'Readers' --desiredMembersQuantity '0'
-    displayName: 'Check Readers group members'
 
 
   - powershell: |
