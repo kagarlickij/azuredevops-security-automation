@@ -22,7 +22,7 @@ schedules:
 
 variables:
 - name: projectName
-  value: 'templ-test14'
+  value: 'templ-test15'
 
 - group: ados-group-names-templ-test01
 - group: ados-acls-templ-test01
@@ -59,6 +59,7 @@ jobs:
       sleep 1
       python ./onprem/get_groups.py --desiredGroupsList '$(administrators-group-name)' '$(developers-group-name)' '$(auditors-group-name)' '$(product-owners-group-name)' '$(projectName) Team' 'Project Administrators' 'Project Valid Users'
     displayName: 'Check list of groups'
+    continueOnError: true
 
 
   - powershell: |
@@ -91,6 +92,7 @@ jobs:
       sleep 1
       python ./onprem/get_group_members.py --groupName 'Project Administrators' --desiredMembersQuantity '1'
     displayName: 'Check Project Administrators group members'
+    continueOnError: true
 
   - powershell: |
       sleep 1
@@ -101,6 +103,7 @@ jobs:
       sleep 1
       python ./onprem/get_group_members.py --groupName 'Project Valid Users' --desiredMembersQuantity '7'
     displayName: 'Check Project Valid Users group members'
+    continueOnError: true
 
 
   - powershell: |

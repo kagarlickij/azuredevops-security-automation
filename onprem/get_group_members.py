@@ -33,4 +33,5 @@ else:
     print(f'[ERROR] Current members quantity does not match desired')
     print(f'[ERROR] Desired members quantity = {ARGS.desiredMembersQuantity}')
     print(f'[ERROR] Current members quantity = {CURRENT_MEMBERS_QUANTITY}')
+    print(f'[ERROR] Current members = {CURRENT_MEMBERS_FILE_READ}')
     sys.exit(1)
