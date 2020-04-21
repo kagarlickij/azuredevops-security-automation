@@ -13,7 +13,7 @@ if not ARGS.desiredGroupsList:
 
 DESIRED_GROUPS_LIST = ARGS.desiredGroupsList
 
-LIST_GROUPS_OUTPUT = open('list_groups_output.txt', "r")
+LIST_GROUPS_OUTPUT = open('groups_list.txt', "r")
 LIST_GROUPS_OUTPUT_READ = LIST_GROUPS_OUTPUT.read()
 CURRENT_GROUPS_LIST = list()
 for LINE in LIST_GROUPS_OUTPUT_READ.splitlines():

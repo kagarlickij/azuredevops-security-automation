@@ -12,7 +12,7 @@ if not ARGS.groupName or not ARGS.groupAce:
     print(f'[ERROR] missing required arguments')
     sys.exit(1)
 
-LIST_GROUPS_OUTPUT = open('list_groups_output.txt', "r")
+LIST_GROUPS_OUTPUT = open('groups_list.txt', "r")
 LIST_GROUPS_OUTPUT_READ = LIST_GROUPS_OUTPUT.read()
 for LINE in LIST_GROUPS_OUTPUT_READ.splitlines():
     if "SID" in LINE:
