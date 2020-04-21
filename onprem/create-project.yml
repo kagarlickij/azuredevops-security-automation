@@ -31,7 +31,7 @@ jobs:
 
   - powershell: |
       $env:Path += ";C:\Users\Administrator\AppData\Roaming\Python\Python38\Scripts"
-      pip install --user -r requirements.txt
+      pip --disable-pip-version-check install --user -r requirements.txt
     displayName: 'Install requirements'
     continueOnError: true
 

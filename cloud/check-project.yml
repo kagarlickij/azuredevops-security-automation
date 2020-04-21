@@ -22,7 +22,7 @@ schedules:
 
 variables:
 - name: projectName
-  value: 'templ-test21'
+  value: 'templ-test22'
 
 - group: ados-group-names-templ-test01
 - group: ados-acls-templ-test01
@@ -39,7 +39,7 @@ jobs:
     displayName: 'Use Python 3.x'
 
   - bash: |
-      pip install --user -r requirements.txt
+      pip --disable-pip-version-check install --user -r requirements.txt
     displayName: 'Install requirements'
 
 
