@@ -81,7 +81,7 @@ else:
                     BRANCH_NAME = BRANCH['name']
                     BRANCH_SHORTNAME = BRANCH_NAME.replace('refs/heads/', '')
                     if ('feature/' in BRANCH_SHORTNAME or 'bugfix/' in BRANCH_SHORTNAME):
-                        URL = '{}/_apis/git/repositories/{}/commits?searchCriteria.itemVersion.version={}&api-version=5.0'.format(ARGS.organization, ARGS.projectName, BRANCH_SHORTNAME)
+                        URL = '{}/_apis/git/repositories/{}/commits?searchCriteria.itemVersion.version={}&api-version=5.0'.format(ARGS.organization, REPO_ID, BRANCH_SHORTNAME)
                         try:
                             RESPONSE = requests.get(URL, headers=HEADERS, auth=(ARGS.pat,''))
                             RESPONSE.raise_for_status()
@@ -136,14 +136,18 @@ else:
                     PRS = RESPONSE.json()['value']
                     for PR in PRS:
                         PR_ID = PR['pullRequestId']
-                        PR_DATE = PR['creationDate']
-                        PR_SHORT_DATE = PR_DATE.split('T')[0]
-                        PR_SHORT_DATE_TIME = datetime.strptime(PR_SHORT_DATE, date_format)
-                        CURRENT_DATE = date.today().strftime('%Y-%m-%d')
-                        CURRENT_DATE_TIME = datetime.strptime(CURRENT_DATE, date_format)
-                        PR_AGE = CURRENT_DATE_TIME - PR_SHORT_DATE_TIME
-                        if int(PR_AGE.days) > int(ARGS.maxPullRequestAge):
-                            OUTDATED_PRS.append(PR_ID)
+                        PR_DRAFT_STATUS = PR['isDraft']
+                        if not PR_DRAFT_STATUS: # Don't need to check Draft PRs
+                            PR_DATE = PR['creationDate']
+                            PR_SHORT_DATE = PR_DATE.split('T')[0]
+                            PR_SHORT_DATE_TIME = datetime.strptime(PR_SHORT_DATE, date_format)
+                            CURRENT_DATE = date.today().strftime('%Y-%m-%d')
+                            CURRENT_DATE_TIME = datetime.strptime(CURRENT_DATE, date_format)
+                            PR_AGE = CURRENT_DATE_TIME - PR_SHORT_DATE_TIME
+                            if int(PR_AGE.days) > int(ARGS.maxPullRequestAge):
+                                OUTDATED_PRS.append(PR_ID)
+                            else:
+                                pass
                         else:
                             pass
 
