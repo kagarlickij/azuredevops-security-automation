@@ -17,7 +17,7 @@ PARSER.add_argument('--pat', type=str)
 ARGS = PARSER.parse_args()
 
 if not ARGS.feedId or not ARGS.groupName or not ARGS.groupAce or not ARGS.role or not ARGS.pat:
-    print(f'[ERROR] missing required arguments')
+    print(f'##vso[task.logissue type=error] missing required arguments')
     sys.exit(1)
 
 ACE = (os.environ[(ARGS.groupAce).upper()])
@@ -38,12 +38,12 @@ try:
     RESPONSE = requests.get(URL, headers=HEADERS, auth=(ARGS.pat,''))
     RESPONSE.raise_for_status()
 except Exception as err:
-    print(f'[ERROR] {err}')
+    print(f'##vso[task.logissue type=error] {err}')
     RESPONSE_TEXT = json.loads(RESPONSE.text)
     CODE = RESPONSE_TEXT['errorCode']
     MESSAGE = RESPONSE_TEXT['message']
-    print(f'[ERROR] Response code: {CODE}')
-    print(f'[ERROR] Response message: {MESSAGE}')
+    print(f'##vso[task.logissue type=error] Response code: {CODE}')
+    print(f'##vso[task.logissue type=error] Response message: {MESSAGE}')
     sys.exit(1)
 else:
     CURRENT_ACL = RESPONSE.json()['value']
@@ -56,14 +56,14 @@ else:
     try:
         CURRENT_ROLE
     except NameError:
-        print(f'[ERROR] Group {ARGS.groupName} was not found')
+        print(f'##vso[task.logissue type=error] Group {ARGS.groupName} was not found')
         sys.exit(1)
     else:
         print(f'[INFO] Checking {ARGS.groupName} group permissions..')
         if CURRENT_ROLE == ARGS.role:
             print(f'[INFO] Current permissions match desired')
         else:
-            print(f'[ERROR] Current permissions do not match desired')
-            print(f'[ERROR] Desired permissions = {ARGS.role}')
-            print(f'[ERROR] Current permissions = {CURRENT_ROLE}')
+            print(f'##vso[task.logissue type=error] Current permissions do not match desired')
+            print(f'##vso[task.logissue type=error] Desired permissions = {ARGS.role}')
+            print(f'##vso[task.logissue type=error] Current permissions = {CURRENT_ROLE}')
             sys.exit(1)

@@ -12,7 +12,7 @@ PARSER.add_argument('--pat', type=str)
 ARGS = PARSER.parse_args()
 
 if not ARGS.projectName or not ARGS.pat:
-    print(f'[ERROR] missing required arguments')
+    print(f'##vso[task.logissue type=error] missing required arguments')
     sys.exit(1)
 
 URL = '{}/_apis/projects?api-version=5.0'.format(ARGS.organization)
@@ -24,12 +24,12 @@ try:
     RESPONSE = requests.get(URL, headers=HEADERS, auth=(ARGS.pat,''))
     RESPONSE.raise_for_status()
 except Exception as err:
-    print(f'[ERROR] {err}')
+    print(f'##vso[task.logissue type=error] {err}')
     RESPONSE_TEXT = json.loads(RESPONSE.text)
     CODE = RESPONSE_TEXT['errorCode']
     MESSAGE = RESPONSE_TEXT['message']
-    print(f'[ERROR] Response code: {CODE}')
-    print(f'[ERROR] Response message: {MESSAGE}')
+    print(f'##vso[task.logissue type=error] Response code: {CODE}')
+    print(f'##vso[task.logissue type=error] Response message: {MESSAGE}')
     sys.exit(1)
 else:
     PROJECT_LIST = RESPONSE.json()['value']

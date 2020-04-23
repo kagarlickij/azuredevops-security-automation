@@ -15,7 +15,7 @@ PARSER.add_argument('--pat', type=str)
 ARGS = PARSER.parse_args()
 
 if not ARGS.projectScopeDescriptor or not ARGS.groupName or not ARGS.groupAce or not ARGS.pat:
-    print(f'[ERROR] missing required arguments')
+    print(f'##vso[task.logissue type=error] missing required arguments')
     sys.exit(1)
 
 URL = '{}/_apis/graph/groups?scopeDescriptor={}&api-version=5.0-preview.1'.format(ARGS.organization, ARGS.projectScopeDescriptor)
@@ -27,12 +27,12 @@ try:
     RESPONSE = requests.get(URL, headers=HEADERS, auth=(ARGS.pat,''))
     RESPONSE.raise_for_status()
 except Exception as err:
-    print(f'[ERROR] {err}')
+    print(f'##vso[task.logissue type=error] {err}')
     RESPONSE_TEXT = json.loads(RESPONSE.text)
     CODE = RESPONSE_TEXT['errorCode']
     MESSAGE = RESPONSE_TEXT['message']
-    print(f'[ERROR] Response code: {CODE}')
-    print(f'[ERROR] Response message: {MESSAGE}')
+    print(f'##vso[task.logissue type=error] Response code: {CODE}')
+    print(f'##vso[task.logissue type=error] Response message: {MESSAGE}')
     sys.exit(1)
 else:
     GROUPS = RESPONSE.json()['value']
@@ -45,7 +45,7 @@ else:
     try:
         GROUP_DESCRIPTOR
     except NameError:
-        print(f'[ERROR] Group {ARGS.groupName} was not found')
+        print(f'##vso[task.logissue type=error] Group {ARGS.groupName} was not found')
         sys.exit(1)
     else:
         print(f'[INFO] Checking {ARGS.groupName} group..')

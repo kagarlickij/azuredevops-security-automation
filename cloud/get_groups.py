@@ -13,7 +13,7 @@ PARSER.add_argument('--pat', type=str)
 ARGS = PARSER.parse_args()
 
 if not ARGS.projectScopeDescriptor or not ARGS.desiredGroupsList or not ARGS.pat:
-    print(f'[ERROR] missing required arguments')
+    print(f'##vso[task.logissue type=error] missing required arguments')
     sys.exit(1)
 
 DESIRED_GROUPS_LIST = ARGS.desiredGroupsList
@@ -27,12 +27,12 @@ try:
     RESPONSE = requests.get(URL, headers=HEADERS, auth=(ARGS.pat,''))
     RESPONSE.raise_for_status()
 except Exception as err:
-    print(f'[ERROR] {err}')
+    print(f'##vso[task.logissue type=error] {err}')
     RESPONSE_TEXT = json.loads(RESPONSE.text)
     CODE = RESPONSE_TEXT['errorCode']
     MESSAGE = RESPONSE_TEXT['message']
-    print(f'[ERROR] Response code: {CODE}')
-    print(f'[ERROR] Response message: {MESSAGE}')
+    print(f'##vso[task.logissue type=error] Response code: {CODE}')
+    print(f'##vso[task.logissue type=error] Response message: {MESSAGE}')
     sys.exit(1)
 else:
     CURRENT_GROUPS_LIST = []
@@ -47,7 +47,7 @@ else:
     if CURRENT_GROUPS_LIST == DESIRED_GROUPS_LIST:
         print(f'[INFO] Current list of groups match desired')
     else:
-        print(f'[ERROR] Current list of groups does not match desired')
-        print(f'[ERROR] currentGroupsList = {CURRENT_GROUPS_LIST}')
-        print(f'[ERROR] desiredGroupsList = {DESIRED_GROUPS_LIST}')
+        print(f'##vso[task.logissue type=error] Current list of groups does not match desired')
+        print(f'##vso[task.logissue type=error] currentGroupsList = {CURRENT_GROUPS_LIST}')
+        print(f'##vso[task.logissue type=error] desiredGroupsList = {DESIRED_GROUPS_LIST}')
         sys.exit(1)

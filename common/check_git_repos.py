@@ -17,7 +17,7 @@ PARSER.add_argument('--pat', type=str)
 ARGS = PARSER.parse_args()
 
 if not ARGS.projectName or not ARGS.maxCommitAge or not ARGS.maxPullRequestAge or not ARGS.minApproverCount or not ARGS.pat:
-    print(f'[ERROR] missing required arguments')
+    print(f'##vso[task.logissue type=error] missing required arguments')
     sys.exit(1)
 
 HEADERS = {
@@ -36,12 +36,12 @@ try:
     RESPONSE = requests.get(URL, headers=HEADERS, auth=(ARGS.pat,''))
     RESPONSE.raise_for_status()
 except Exception as err:
-    print(f'[ERROR] {err}')
+    print(f'##vso[task.logissue type=error] {err}')
     RESPONSE_TEXT = json.loads(RESPONSE.text)
     CODE = RESPONSE_TEXT['errorCode']
     MESSAGE = RESPONSE_TEXT['message']
-    print(f'[ERROR] Response code: {CODE}')
-    print(f'[ERROR] Response message: {MESSAGE}')
+    print(f'##vso[task.logissue type=error] Response code: {CODE}')
+    print(f'##vso[task.logissue type=error] Response message: {MESSAGE}')
     sys.exit(1)
 else:
     REPOS = RESPONSE.json()['value']
@@ -63,12 +63,12 @@ else:
                 RESPONSE = requests.get(URL, headers=HEADERS, auth=(ARGS.pat,''))
                 RESPONSE.raise_for_status()
             except Exception as err:
-                print(f'[ERROR] {err}')
+                print(f'##vso[task.logissue type=error] {err}')
                 RESPONSE_TEXT = json.loads(RESPONSE.text)
                 CODE = RESPONSE_TEXT['errorCode']
                 MESSAGE = RESPONSE_TEXT['message']
-                print(f'[ERROR] Response code: {CODE}')
-                print(f'[ERROR] Response message: {MESSAGE}')
+                print(f'##vso[task.logissue type=error] Response code: {CODE}')
+                print(f'##vso[task.logissue type=error] Response message: {MESSAGE}')
                 sys.exit(1)
             else:
                 BRANCHES = RESPONSE.json()['value']
@@ -86,12 +86,12 @@ else:
                             RESPONSE = requests.get(URL, headers=HEADERS, auth=(ARGS.pat,''))
                             RESPONSE.raise_for_status()
                         except Exception as err:
-                            print(f'[ERROR] {err}')
+                            print(f'##vso[task.logissue type=error] {err}')
                             RESPONSE_TEXT = json.loads(RESPONSE.text)
                             CODE = RESPONSE_TEXT['errorCode']
                             MESSAGE = RESPONSE_TEXT['message']
-                            print(f'[ERROR] Response code: {CODE}')
-                            print(f'[ERROR] Response message: {MESSAGE}')
+                            print(f'##vso[task.logissue type=error] Response code: {CODE}')
+                            print(f'##vso[task.logissue type=error] Response message: {MESSAGE}')
                             sys.exit(1)
                         else:
                             LATEST_COMMIT_ID = RESPONSE.json()['value'][0]['commitId']
@@ -102,7 +102,7 @@ else:
                             CURRENT_DATE_TIME = datetime.strptime(CURRENT_DATE, date_format)
                             LATEST_COMMIT_AGE = CURRENT_DATE_TIME - LATEST_COMMIT_SHORT_DATE_TIME
                             if int(LATEST_COMMIT_AGE.days) > int(ARGS.maxCommitAge):
-                                print(f'[ERROR] Latest commit {LATEST_COMMIT_ID} is too old: {LATEST_COMMIT_AGE.days} day(s)')
+                                print(f'##vso[task.logissue type=error] Latest commit {LATEST_COMMIT_ID} is too old: {LATEST_COMMIT_AGE.days} day(s)')
                                 OUTDATED_BRANCHES.append(BRANCH_SHORTNAME)
                             else:
                                 pass
@@ -125,12 +125,12 @@ else:
                     RESPONSE = requests.get(URL, headers=HEADERS, auth=(ARGS.pat,''))
                     RESPONSE.raise_for_status()
                 except Exception as err:
-                    print(f'[ERROR] {err}')
+                    print(f'##vso[task.logissue type=error] {err}')
                     RESPONSE_TEXT = json.loads(RESPONSE.text)
                     CODE = RESPONSE_TEXT['errorCode']
                     MESSAGE = RESPONSE_TEXT['message']
-                    print(f'[ERROR] Response code: {CODE}')
-                    print(f'[ERROR] Response message: {MESSAGE}')
+                    print(f'##vso[task.logissue type=error] Response code: {CODE}')
+                    print(f'##vso[task.logissue type=error] Response message: {MESSAGE}')
                     sys.exit(1)
                 else:
                     PRS = RESPONSE.json()['value']
@@ -172,12 +172,12 @@ try:
     RESPONSE = requests.get(URL, headers=HEADERS, auth=(ARGS.pat,''))
     RESPONSE.raise_for_status()
 except Exception as err:
-    print(f'[ERROR] {err}')
+    print(f'##vso[task.logissue type=error] {err}')
     RESPONSE_TEXT = json.loads(RESPONSE.text)
     CODE = RESPONSE_TEXT['errorCode']
     MESSAGE = RESPONSE_TEXT['message']
-    print(f'[ERROR] Response code: {CODE}')
-    print(f'[ERROR] Response message: {MESSAGE}')
+    print(f'##vso[task.logissue type=error] Response code: {CODE}')
+    print(f'##vso[task.logissue type=error] Response message: {MESSAGE}')
     sys.exit(1)
 else:
     BRANCH_POLICY_COUNT = RESPONSE.json()['count']
@@ -188,11 +188,11 @@ else:
         if MATCH_KIND == "Exact" and REPO_ID is None and APPROVERS_COUNT >= int(ARGS.minApproverCount):
             print(f'[INFO] default branch has reviewers policy assigned, minimum number of reviewers is {APPROVERS_COUNT}')
         else:
-            print(f'[ERROR] default branch does not have valid reviewers policy assigned')
+            print(f'##vso[task.logissue type=error] default branch does not have valid reviewers policy assigned')
             print(f'[DEBUG] MATCH_KIND = {MATCH_KIND}')
             print(f'[DEBUG] REPO_ID = {REPO_ID}')
             print(f'[DEBUG] APPROVERS_COUNT = {APPROVERS_COUNT}')
             sys.exit(1)
     else:
-        print(f'[ERROR] default branch does not have policies assigned')
+        print(f'##vso[task.logissue type=error] default branch does not have policies assigned')
         sys.exit(1)

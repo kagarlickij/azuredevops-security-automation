@@ -9,7 +9,7 @@ PARSER.add_argument('--groupAce', type=str)
 ARGS = PARSER.parse_args()
 
 if not ARGS.groupName or not ARGS.groupAce:
-    print(f'[ERROR] missing required arguments')
+    print(f'##vso[task.logissue type=error] missing required arguments')
     sys.exit(1)
 
 LIST_GROUPS_OUTPUT = open('groups_list.txt', "r")
@@ -25,7 +25,7 @@ for LINE in LIST_GROUPS_OUTPUT_READ.splitlines():
 try:
     SID
 except NameError:
-    print(f'[ERROR] Group {ARGS.groupName} was not found')
+    print(f'##vso[task.logissue type=error] Group {ARGS.groupName} was not found')
     sys.exit(1)
 else:
     print(f'[INFO] Group {ARGS.groupName} ACE = {SID}')

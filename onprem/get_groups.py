@@ -8,7 +8,7 @@ PARSER.add_argument('--desiredGroupsList', nargs='+')
 ARGS = PARSER.parse_args()
 
 if not ARGS.desiredGroupsList:
-    print(f'[ERROR] missing required arguments')
+    print(f'##vso[task.logissue type=error] missing required arguments')
     sys.exit(1)
 
 DESIRED_GROUPS_LIST = ARGS.desiredGroupsList
@@ -29,7 +29,7 @@ CURRENT_GROUPS_LIST.sort()
 if CURRENT_GROUPS_LIST == DESIRED_GROUPS_LIST:
     print(f'[INFO] Current list of groups match desired')
 else:
-    print(f'[ERROR] Current list of groups does not match desired')
-    print(f'[ERROR] currentGroupsList = {CURRENT_GROUPS_LIST}')
-    print(f'[ERROR] desiredGroupsList = {DESIRED_GROUPS_LIST}')
+    print(f'##vso[task.logissue type=error] Current list of groups does not match desired')
+    print(f'##vso[task.logissue type=error] currentGroupsList = {CURRENT_GROUPS_LIST}')
+    print(f'##vso[task.logissue type=error] desiredGroupsList = {DESIRED_GROUPS_LIST}')
     sys.exit(1)

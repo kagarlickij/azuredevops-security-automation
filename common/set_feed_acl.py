@@ -17,7 +17,7 @@ PARSER.add_argument('--pat', type=str)
 ARGS = PARSER.parse_args()
 
 if not ARGS.feedId or not ARGS.groupName or not ARGS.groupAce or not ARGS.role or not ARGS.pat:
-    print(f'[ERROR] missing required arguments')
+    print(f'##vso[task.logissue type=error] missing required arguments')
     sys.exit(1)
 
 ACE = (os.environ[(ARGS.groupAce).upper()])
@@ -37,12 +37,12 @@ try:
     RESPONSE = requests.get(URL, headers=HEADERS, auth=(ARGS.pat,''))
     RESPONSE.raise_for_status()
 except Exception as err:
-    print(f'[ERROR] {err}')
+    print(f'##vso[task.logissue type=error] {err}')
     RESPONSE_TEXT = json.loads(RESPONSE.text)
     CODE = RESPONSE_TEXT['errorCode']
     MESSAGE = RESPONSE_TEXT['message']
-    print(f'[ERROR] Response code: {CODE}')
-    print(f'[ERROR] Response message: {MESSAGE}')
+    print(f'##vso[task.logissue type=error] Response code: {CODE}')
+    print(f'##vso[task.logissue type=error] Response message: {MESSAGE}')
     sys.exit(1)
 else:
     CURRENT_ACL = RESPONSE.json()
@@ -62,17 +62,17 @@ else:
         RESPONSE = requests.patch(URL, headers=HEADERS, data=json.dumps(DESIRED_ACL), auth=(ARGS.pat,''))
         RESPONSE.raise_for_status()
     except Exception as err:
-        print(f'[ERROR] {err}')
+        print(f'##vso[task.logissue type=error] {err}')
         RESPONSE_TEXT = json.loads(RESPONSE.text)
         CODE = RESPONSE_TEXT['errorCode']
         MESSAGE = RESPONSE_TEXT['message']
-        print(f'[ERROR] Response code: {CODE}')
-        print(f'[ERROR] Response message: {MESSAGE}')
+        print(f'##vso[task.logissue type=error] Response code: {CODE}')
+        print(f'##vso[task.logissue type=error] Response message: {MESSAGE}')
         sys.exit(1)
     else:
         RESPONSE_CODE = RESPONSE.status_code
         if RESPONSE_CODE == 200:
             print(f'[INFO] Permissions for {ARGS.groupName} group have been set successfully')
         else:
-            print(f'[ERROR] Permissions for {ARGS.groupName} group have not been set successfully')
+            print(f'##vso[task.logissue type=error] Permissions for {ARGS.groupName} group have not been set successfully')
             sys.exit(1)
