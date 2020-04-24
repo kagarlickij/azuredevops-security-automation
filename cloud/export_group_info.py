@@ -9,12 +9,12 @@ PARSER = argparse.ArgumentParser()
 PARSER.add_argument('--organization', type=str)
 PARSER.add_argument('--projectScopeDescriptor', type=str)
 PARSER.add_argument('--groupName', type=str)
-PARSER.add_argument('--groupAce', type=str)
+PARSER.add_argument('--groupSid', type=str)
 PARSER.add_argument('--pat', type=str)
 
 ARGS = PARSER.parse_args()
 
-if not ARGS.projectScopeDescriptor or not ARGS.groupName or not ARGS.groupAce or not ARGS.pat:
+if not ARGS.projectScopeDescriptor or not ARGS.groupName or not ARGS.groupSid or not ARGS.pat:
     print(f'##vso[task.logissue type=error] missing required arguments')
     sys.exit(1)
 
@@ -52,6 +52,6 @@ else:
         DESCRIPTOR = GROUP_DESCRIPTOR.split('vssgp.',1)[1]
 
         for SYM in DESCRIPTOR.split('.'):
-            ACE = base64.b64decode(SYM + '=' * (-len(SYM) % 4)).decode('utf-8')
-            print(f'[INFO] Group {ARGS.groupName} ACE = {ACE}')
-            print(f'##vso[task.setvariable variable={ARGS.groupAce}]{ACE}')
+            SID = base64.b64decode(SYM + '=' * (-len(SYM) % 4)).decode('utf-8')
+            print(f'[INFO] Group {ARGS.groupName} SID = {SID}')
+            print(f'##vso[task.setvariable variable={ARGS.groupSid}]{SID}')

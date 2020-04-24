@@ -10,14 +10,14 @@ PARSER.add_argument('--organization', type=str)
 PARSER.add_argument('--namespaceId', type=str)
 PARSER.add_argument('--projectId', type=str)
 PARSER.add_argument('--groupName', type=str)
-PARSER.add_argument('--groupAce', type=str)
+PARSER.add_argument('--groupSid', type=str)
 PARSER.add_argument('--allow', type=str)
 PARSER.add_argument('--deny', type=str)
 PARSER.add_argument('--pat', type=str)
 
 ARGS = PARSER.parse_args()
 
-if not ARGS.projectId or not ARGS.groupName or not ARGS.groupAce or not ARGS.allow or not ARGS.deny or not ARGS.pat:
+if not ARGS.projectId or not ARGS.groupName or not ARGS.groupSid or not ARGS.allow or not ARGS.deny or not ARGS.pat:
     print(f'##vso[task.logissue type=error] missing required arguments')
     sys.exit(1)
 
@@ -37,7 +37,8 @@ else:
     print(f'[INFO] standart format for token')
     TOKEN = f'{ARGS.projectId}'
 
-ACE = (os.environ[(ARGS.groupAce).upper()])
+SID = (os.environ[(ARGS.groupSid).upper()])
+DESCRIPTOR = f'Microsoft.TeamFoundation.Identity;{SID}'
 
 URL = '{}/_apis/accesscontrollists/{}?token={}&api-version=5.0'.format(ARGS.organization, ARGS.namespaceId, TOKEN)
 HEADERS = {
@@ -56,42 +57,15 @@ except Exception as err:
     print(f'##vso[task.logissue type=error] Response message: {MESSAGE}')
     sys.exit(1)
 else:
-    CURRENT_ACL = RESPONSE.json()
-    NEW_ACE = {
-        'descriptor': f'Microsoft.TeamFoundation.Identity;{ACE}',
-        'allow': f'{ARGS.allow}',
-        'deny': f'{ARGS.deny}'
-    }
+    CURRENT_ACL = RESPONSE.json()['value'][0]['acesDictionary']
+    print(f'[DEBUG] CURRENT_ACL= {CURRENT_ACL}')
+    CURRENT_ALLOW = CURRENT_ACL.get(DESCRIPTOR)['allow']
+    CURRENT_DENY = CURRENT_ACL.get(DESCRIPTOR)['deny']
 
-    if CURRENT_ACL['count'] == 0:
-        ACCESS_DICT = {f'Microsoft.TeamFoundation.Identity;{ACE}': NEW_ACE}
+    if CURRENT_ALLOW == int(ARGS.allow) and CURRENT_DENY == int(ARGS.deny):
+        print(f'[INFO] Current permissions match desired')
     else:
-        ACCESS_DICT = CURRENT_ACL['value'][0]['acesDictionary']
-        ACCESS_DICT[f'Microsoft.TeamFoundation.Identity;{ACE}'] = NEW_ACE
-
-    DESIRED_ACL = {'count': 1, 'value': [{'inheritPermissions': 'true', 'token': f'{TOKEN}', 'acesDictionary': ACCESS_DICT}]}
-
-    URL = '{}/_apis/accesscontrollists/{}?api-version=5.0'.format(ARGS.organization, ARGS.namespaceId)
-    HEADERS = {
-        'Content-Type': 'application/json',
-    }
-
-    print(f'[INFO] Setting permissions for {ARGS.groupName} group..')
-    try:
-        RESPONSE = requests.post(URL, headers=HEADERS, data=json.dumps(DESIRED_ACL), auth=(ARGS.pat,''))
-        RESPONSE.raise_for_status()
-    except Exception as err:
-        print(f'##vso[task.logissue type=error] {err}')
-        RESPONSE_TEXT = json.loads(RESPONSE.text)
-        CODE = RESPONSE_TEXT['errorCode']
-        MESSAGE = RESPONSE_TEXT['message']
-        print(f'##vso[task.logissue type=error] Response code: {CODE}')
-        print(f'##vso[task.logissue type=error] Response message: {MESSAGE}')
+        print(f'##vso[task.logissue type=error] Current permissions do not match desired')
+        print(f'##vso[task.logissue type=error] Desired permissions = {ARGS.allow} / {ARGS.deny}')
+        print(f'##vso[task.logissue type=error] Current permissions = {CURRENT_ALLOW} / {CURRENT_DENY}')
         sys.exit(1)
-    else:
-        RESPONSE_CODE = RESPONSE.status_code
-        if RESPONSE_CODE == 204:
-            print(f'[INFO] Permissions for {ARGS.groupName} group have been set successfully')
-        else:
-            print(f'##vso[task.logissue type=error] Permissions for {ARGS.groupName} group have not been set successfully')
-            sys.exit(1)

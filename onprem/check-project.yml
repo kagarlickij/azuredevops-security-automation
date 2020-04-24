@@ -64,22 +64,22 @@ jobs:
 
   - powershell: |
       sleep 1
-      python ./onprem/export_group_info.py --groupName $(administrators-group-name) --groupAce $(administrators-group-ace)
+      python ./onprem/export_group_info.py --groupName $(administrators-group-name) --groupSid $(administrators-group-sid)
     displayName: 'Export $(projectName)-administrators group info'
 
   - powershell: |
       sleep 1
-      python ./onprem/export_group_info.py --groupName $(developers-group-name) --groupAce $(developers-group-ace)
+      python ./onprem/export_group_info.py --groupName $(developers-group-name) --groupSid $(developers-group-sid)
     displayName: 'Export $(projectName)-developers group info'
 
   - powershell: |
       sleep 1
-      python ./onprem/export_group_info.py --groupName $(auditors-group-name) --groupAce $(auditors-group-ace)
+      python ./onprem/export_group_info.py --groupName $(auditors-group-name) --groupSid $(auditors-group-sid)
     displayName: 'Export $(projectName)-auditors group info'
 
   - powershell: |
       sleep 1
-      python ./onprem/export_group_info.py --groupName $(product-owners-group-name) --groupAce $(product-owners-group-ace)
+      python ./onprem/export_group_info.py --groupName $(product-owners-group-name) --groupSid $(product-owners-group-sid)
     displayName: 'Export $(projectName)-product-owners group info'
 
 
@@ -108,7 +108,7 @@ jobs:
 
   - powershell: |
       sleep 1
-      python ./common/get_ace.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --projectId $Env:PROJECT_ID --namespaceId '52d39943-cb85-4d7f-8fa8-c6baac873819' --groupName $(administrators-group-name) --groupAce $(administrators-group-ace) --allow $(administrators-project-allow-permissions) --deny $(administrators-project-deny-permissions) --pat $(onprem_pat)
+      python ./common/get_permissions.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --projectId $Env:PROJECT_ID --namespaceId '52d39943-cb85-4d7f-8fa8-c6baac873819' --groupName $(administrators-group-name) --groupSid $(administrators-group-sid) --allow $(administrators-project-allow-permissions) --deny $(administrators-project-deny-permissions) --pat $(onprem_pat)
     displayName: 'Check Project permissions for $(projectName)-administrators group'
     continueOnError: true
     env:
@@ -116,7 +116,7 @@ jobs:
 
   - powershell: |
       sleep 1
-      python ./common/get_ace.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --projectId $Env:PROJECT_ID --namespaceId '52d39943-cb85-4d7f-8fa8-c6baac873819' --groupName $(developers-group-name) --groupAce $(developers-group-ace) --allow $(developers-project-allow-permissions) --deny $(developers-project-deny-permissions) --pat $(onprem_pat)
+      python ./common/get_permissions.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --projectId $Env:PROJECT_ID --namespaceId '52d39943-cb85-4d7f-8fa8-c6baac873819' --groupName $(developers-group-name) --groupSid $(developers-group-sid) --allow $(developers-project-allow-permissions) --deny $(developers-project-deny-permissions) --pat $(onprem_pat)
     displayName: 'Check Project permissions for $(projectName)-developers group'
     continueOnError: true
     env:
@@ -124,7 +124,7 @@ jobs:
 
   - powershell: |
       sleep 1
-      python ./common/get_ace.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --projectId $Env:PROJECT_ID --namespaceId '52d39943-cb85-4d7f-8fa8-c6baac873819' --groupName $(auditors-group-name) --groupAce $(auditors-group-ace) --allow $(auditors-project-allow-permissions) --deny $(auditors-project-deny-permissions) --pat $(onprem_pat)
+      python ./common/get_permissions.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --projectId $Env:PROJECT_ID --namespaceId '52d39943-cb85-4d7f-8fa8-c6baac873819' --groupName $(auditors-group-name) --groupSid $(auditors-group-sid) --allow $(auditors-project-allow-permissions) --deny $(auditors-project-deny-permissions) --pat $(onprem_pat)
     displayName: 'Check Project permissions for $(projectName)-auditors group'
     continueOnError: true
     env:
@@ -132,7 +132,7 @@ jobs:
 
   - powershell: |
       sleep 1
-      python ./common/get_ace.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --projectId $Env:PROJECT_ID --namespaceId '52d39943-cb85-4d7f-8fa8-c6baac873819' --groupName $(product-owners-group-name) --groupAce $(product-owners-group-ace) --allow $(product-owners-project-allow-permissions) --deny $(product-owners-project-deny-permissions) --pat $(onprem_pat)
+      python ./common/get_permissions.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --projectId $Env:PROJECT_ID --namespaceId '52d39943-cb85-4d7f-8fa8-c6baac873819' --groupName $(product-owners-group-name) --groupSid $(product-owners-group-sid) --allow $(product-owners-project-allow-permissions) --deny $(product-owners-project-deny-permissions) --pat $(onprem_pat)
     displayName: 'Check Project permissions for $(projectName)-product-owners group'
     continueOnError: true
     env:
@@ -141,7 +141,7 @@ jobs:
 
   - powershell: |
       sleep 1
-      python ./common/get_ace.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --projectId $Env:PROJECT_ID --namespaceId 'd34d3680-dfe5-4cc6-a949-7d9c68f73cba' --groupName $(administrators-group-name) --groupAce $(administrators-group-ace) --allow $(administrators-analytics-allow-permissions) --deny $(administrators-analytics-deny-permissions) --pat $(onprem_pat)
+      python ./common/get_permissions.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --projectId $Env:PROJECT_ID --namespaceId 'd34d3680-dfe5-4cc6-a949-7d9c68f73cba' --groupName $(administrators-group-name) --groupSid $(administrators-group-sid) --allow $(administrators-analytics-allow-permissions) --deny $(administrators-analytics-deny-permissions) --pat $(onprem_pat)
     displayName: 'Check Analytics permissions for $(projectName)-administrators group'
     continueOnError: true
     env:
@@ -149,7 +149,7 @@ jobs:
 
   - powershell: |
       sleep 1
-      python ./common/get_ace.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --projectId $Env:PROJECT_ID --namespaceId 'd34d3680-dfe5-4cc6-a949-7d9c68f73cba' --groupName $(developers-group-name) --groupAce $(developers-group-ace) --allow $(developers-analytics-allow-permissions) --deny $(developers-analytics-deny-permissions) --pat $(onprem_pat)
+      python ./common/get_permissions.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --projectId $Env:PROJECT_ID --namespaceId 'd34d3680-dfe5-4cc6-a949-7d9c68f73cba' --groupName $(developers-group-name) --groupSid $(developers-group-sid) --allow $(developers-analytics-allow-permissions) --deny $(developers-analytics-deny-permissions) --pat $(onprem_pat)
     displayName: 'Check Analytics permissions for $(projectName)-developers group'
     continueOnError: true
     env:
@@ -157,7 +157,7 @@ jobs:
 
   - powershell: |
       sleep 1
-      python ./common/get_ace.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --projectId $Env:PROJECT_ID --namespaceId 'd34d3680-dfe5-4cc6-a949-7d9c68f73cba' --groupName $(auditors-group-name) --groupAce $(auditors-group-ace) --allow $(auditors-analytics-allow-permissions) --deny $(auditors-analytics-deny-permissions) --pat $(onprem_pat)
+      python ./common/get_permissions.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --projectId $Env:PROJECT_ID --namespaceId 'd34d3680-dfe5-4cc6-a949-7d9c68f73cba' --groupName $(auditors-group-name) --groupSid $(auditors-group-sid) --allow $(auditors-analytics-allow-permissions) --deny $(auditors-analytics-deny-permissions) --pat $(onprem_pat)
     displayName: 'Check Analytics permissions for $(projectName)-auditors group'
     continueOnError: true
     env:
@@ -165,7 +165,7 @@ jobs:
 
   - powershell: |
       sleep 1
-      python ./common/get_ace.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --projectId $Env:PROJECT_ID --namespaceId 'd34d3680-dfe5-4cc6-a949-7d9c68f73cba' --groupName $(product-owners-group-name) --groupAce $(product-owners-group-ace) --allow $(product-owners-analytics-allow-permissions) --deny $(product-owners-analytics-deny-permissions) --pat $(onprem_pat)
+      python ./common/get_permissions.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --projectId $Env:PROJECT_ID --namespaceId 'd34d3680-dfe5-4cc6-a949-7d9c68f73cba' --groupName $(product-owners-group-name) --groupSid $(product-owners-group-sid) --allow $(product-owners-analytics-allow-permissions) --deny $(product-owners-analytics-deny-permissions) --pat $(onprem_pat)
     displayName: 'Check Analytics permissions for $(projectName)-product-owners group'
     continueOnError: true
     env:
@@ -174,7 +174,7 @@ jobs:
 
   - powershell: |
       sleep 1
-      python ./common/get_ace.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --projectId $Env:PROJECT_ID --namespaceId 'b7e84409-6553-448a-bbb2-af228e07cbeb' --groupName $(administrators-group-name) --groupAce $(administrators-group-ace) --allow $(administrators-library-allow-permissions) --deny $(administrators-library-deny-permissions) --pat $(onprem_pat)
+      python ./common/get_permissions.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --projectId $Env:PROJECT_ID --namespaceId 'b7e84409-6553-448a-bbb2-af228e07cbeb' --groupName $(administrators-group-name) --groupSid $(administrators-group-sid) --allow $(administrators-library-allow-permissions) --deny $(administrators-library-deny-permissions) --pat $(onprem_pat)
     displayName: 'Check Library permissions for $(projectName)-administrators group'
     continueOnError: true
     env:
@@ -182,7 +182,7 @@ jobs:
 
   - powershell: |
       sleep 1
-      python ./common/get_ace.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --projectId $Env:PROJECT_ID --namespaceId 'b7e84409-6553-448a-bbb2-af228e07cbeb' --groupName $(developers-group-name) --groupAce $(developers-group-ace) --allow $(developers-library-allow-permissions) --deny $(developers-library-deny-permissions) --pat $(onprem_pat)
+      python ./common/get_permissions.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --projectId $Env:PROJECT_ID --namespaceId 'b7e84409-6553-448a-bbb2-af228e07cbeb' --groupName $(developers-group-name) --groupSid $(developers-group-sid) --allow $(developers-library-allow-permissions) --deny $(developers-library-deny-permissions) --pat $(onprem_pat)
     displayName: 'Check Library permissions for $(projectName)-developers group'
     continueOnError: true
     env:
@@ -190,7 +190,7 @@ jobs:
 
   - powershell: |
       sleep 1
-      python ./common/get_ace.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --projectId $Env:PROJECT_ID --namespaceId 'b7e84409-6553-448a-bbb2-af228e07cbeb' --groupName $(auditors-group-name) --groupAce $(auditors-group-ace) --allow $(auditors-library-allow-permissions) --deny $(auditors-library-deny-permissions) --pat $(onprem_pat)
+      python ./common/get_permissions.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --projectId $Env:PROJECT_ID --namespaceId 'b7e84409-6553-448a-bbb2-af228e07cbeb' --groupName $(auditors-group-name) --groupSid $(auditors-group-sid) --allow $(auditors-library-allow-permissions) --deny $(auditors-library-deny-permissions) --pat $(onprem_pat)
     displayName: 'Check Library permissions for $(projectName)-auditors group'
     continueOnError: true
     env:
@@ -198,7 +198,7 @@ jobs:
 
   - powershell: |
       sleep 1
-      python ./common/get_ace.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --projectId $Env:PROJECT_ID --namespaceId 'b7e84409-6553-448a-bbb2-af228e07cbeb' --groupName $(product-owners-group-name) --groupAce $(product-owners-group-ace) --allow $(product-owners-library-allow-permissions) --deny $(product-owners-library-deny-permissions) --pat $(onprem_pat)
+      python ./common/get_permissions.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --projectId $Env:PROJECT_ID --namespaceId 'b7e84409-6553-448a-bbb2-af228e07cbeb' --groupName $(product-owners-group-name) --groupSid $(product-owners-group-sid) --allow $(product-owners-library-allow-permissions) --deny $(product-owners-library-deny-permissions) --pat $(onprem_pat)
     displayName: 'Check Library permissions for $(projectName)-product-owners group'
     continueOnError: true
     env:
@@ -214,7 +214,7 @@ jobs:
 
   - powershell: |
       sleep 1
-      python ./common/get_ace.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --projectId $Env:PROJECT_ID --namespaceId '2e9eb7ed-3c0a-47d4-87c1-0ffdd275fd87' --groupName $(administrators-group-name) --groupAce $(administrators-group-ace) --allow $(administrators-git-allow-permissions) --deny $(administrators-git-deny-permissions) --pat $(onprem_pat)
+      python ./common/get_permissions.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --projectId $Env:PROJECT_ID --namespaceId '2e9eb7ed-3c0a-47d4-87c1-0ffdd275fd87' --groupName $(administrators-group-name) --groupSid $(administrators-group-sid) --allow $(administrators-git-allow-permissions) --deny $(administrators-git-deny-permissions) --pat $(onprem_pat)
     displayName: 'Check Git permissions for $(projectName)-administrators group'
     continueOnError: true
     env:
@@ -222,7 +222,7 @@ jobs:
 
   - powershell: |
       sleep 1
-      python ./common/get_ace.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --projectId $Env:PROJECT_ID --namespaceId '2e9eb7ed-3c0a-47d4-87c1-0ffdd275fd87' --groupName $(developers-group-name) --groupAce $(developers-group-ace) --allow $(developers-git-allow-permissions) --deny $(developers-git-deny-permissions) --pat $(onprem_pat)
+      python ./common/get_permissions.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --projectId $Env:PROJECT_ID --namespaceId '2e9eb7ed-3c0a-47d4-87c1-0ffdd275fd87' --groupName $(developers-group-name) --groupSid $(developers-group-sid) --allow $(developers-git-allow-permissions) --deny $(developers-git-deny-permissions) --pat $(onprem_pat)
     displayName: 'Check Git permissions for $(projectName)-developers group'
     continueOnError: true
     env:
@@ -230,7 +230,7 @@ jobs:
 
   - powershell: |
       sleep 1
-      python ./common/get_ace.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --projectId $Env:PROJECT_ID --namespaceId '2e9eb7ed-3c0a-47d4-87c1-0ffdd275fd87' --groupName $(auditors-group-name) --groupAce $(auditors-group-ace) --allow $(auditors-git-allow-permissions) --deny $(auditors-git-deny-permissions) --pat $(onprem_pat)
+      python ./common/get_permissions.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --projectId $Env:PROJECT_ID --namespaceId '2e9eb7ed-3c0a-47d4-87c1-0ffdd275fd87' --groupName $(auditors-group-name) --groupSid $(auditors-group-sid) --allow $(auditors-git-allow-permissions) --deny $(auditors-git-deny-permissions) --pat $(onprem_pat)
     displayName: 'Check Git permissions for $(projectName)-auditors group'
     continueOnError: true
     env:
@@ -238,7 +238,7 @@ jobs:
 
   - powershell: |
       sleep 1
-      python ./common/get_ace.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --projectId $Env:PROJECT_ID --namespaceId '2e9eb7ed-3c0a-47d4-87c1-0ffdd275fd87' --groupName $(product-owners-group-name) --groupAce $(product-owners-group-ace) --allow $(product-owners-git-allow-permissions) --deny $(product-owners-git-deny-permissions) --pat $(onprem_pat)
+      python ./common/get_permissions.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --projectId $Env:PROJECT_ID --namespaceId '2e9eb7ed-3c0a-47d4-87c1-0ffdd275fd87' --groupName $(product-owners-group-name) --groupSid $(product-owners-group-sid) --allow $(product-owners-git-allow-permissions) --deny $(product-owners-git-deny-permissions) --pat $(onprem_pat)
     displayName: 'Check Git permissions for $(projectName)-product-owners group'
     continueOnError: true
     env:
@@ -247,7 +247,7 @@ jobs:
 
   - powershell: |
       sleep 1
-      python ./common/get_ace.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --projectId $Env:PROJECT_ID --namespaceId '33344d9c-fc72-4d6f-aba5-fa317101a7e9' --groupName $(administrators-group-name) --groupAce $(administrators-group-ace) --allow $(administrators-build-allow-permissions) --deny $(administrators-build-deny-permissions) --pat $(onprem_pat)
+      python ./common/get_permissions.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --projectId $Env:PROJECT_ID --namespaceId '33344d9c-fc72-4d6f-aba5-fa317101a7e9' --groupName $(administrators-group-name) --groupSid $(administrators-group-sid) --allow $(administrators-build-allow-permissions) --deny $(administrators-build-deny-permissions) --pat $(onprem_pat)
     displayName: 'Check Build permissions for $(projectName)-administrators group'
     continueOnError: true
     env:
@@ -255,7 +255,7 @@ jobs:
 
   - powershell: |
       sleep 1
-      python ./common/get_ace.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --projectId $Env:PROJECT_ID --namespaceId '33344d9c-fc72-4d6f-aba5-fa317101a7e9' --groupName $(developers-group-name) --groupAce $(developers-group-ace) --allow $(developers-build-allow-permissions) --deny $(developers-build-deny-permissions) --pat $(onprem_pat)
+      python ./common/get_permissions.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --projectId $Env:PROJECT_ID --namespaceId '33344d9c-fc72-4d6f-aba5-fa317101a7e9' --groupName $(developers-group-name) --groupSid $(developers-group-sid) --allow $(developers-build-allow-permissions) --deny $(developers-build-deny-permissions) --pat $(onprem_pat)
     displayName: 'Check Build permissions for $(projectName)-developers group'
     continueOnError: true
     env:
@@ -263,7 +263,7 @@ jobs:
 
   - powershell: |
       sleep 1
-      python ./common/get_ace.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --projectId $Env:PROJECT_ID --namespaceId '33344d9c-fc72-4d6f-aba5-fa317101a7e9' --groupName $(auditors-group-name) --groupAce $(auditors-group-ace) --allow $(auditors-build-allow-permissions) --deny $(auditors-build-deny-permissions) --pat $(onprem_pat)
+      python ./common/get_permissions.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --projectId $Env:PROJECT_ID --namespaceId '33344d9c-fc72-4d6f-aba5-fa317101a7e9' --groupName $(auditors-group-name) --groupSid $(auditors-group-sid) --allow $(auditors-build-allow-permissions) --deny $(auditors-build-deny-permissions) --pat $(onprem_pat)
     displayName: 'Check Build permissions for $(projectName)-auditors group'
     continueOnError: true
     env:
@@ -271,7 +271,7 @@ jobs:
 
   - powershell: |
       sleep 1
-      python ./common/get_ace.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --projectId $Env:PROJECT_ID --namespaceId '33344d9c-fc72-4d6f-aba5-fa317101a7e9' --groupName $(product-owners-group-name) --groupAce $(product-owners-group-ace) --allow $(product-owners-build-allow-permissions) --deny $(product-owners-build-deny-permissions) --pat $(onprem_pat)
+      python ./common/get_permissions.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --projectId $Env:PROJECT_ID --namespaceId '33344d9c-fc72-4d6f-aba5-fa317101a7e9' --groupName $(product-owners-group-name) --groupSid $(product-owners-group-sid) --allow $(product-owners-build-allow-permissions) --deny $(product-owners-build-deny-permissions) --pat $(onprem_pat)
     displayName: 'Check Build permissions for $(projectName)-product-owners group'
     continueOnError: true
     env:
@@ -280,7 +280,7 @@ jobs:
 
   - powershell: |
       sleep 1
-      python ./common/get_ace.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --projectId $Env:PROJECT_ID --namespaceId 'c788c23e-1b46-4162-8f5e-d7585343b5de' --groupName $(administrators-group-name) --groupAce $(administrators-group-ace) --allow $(administrators-release-allow-permissions) --deny $(administrators-release-deny-permissions) --pat $(onprem_pat)
+      python ./common/get_permissions.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --projectId $Env:PROJECT_ID --namespaceId 'c788c23e-1b46-4162-8f5e-d7585343b5de' --groupName $(administrators-group-name) --groupSid $(administrators-group-sid) --allow $(administrators-release-allow-permissions) --deny $(administrators-release-deny-permissions) --pat $(onprem_pat)
     displayName: 'Check Release permissions for $(projectName)-administrators group'
     continueOnError: true
     env:
@@ -288,7 +288,7 @@ jobs:
 
   - powershell: |
       sleep 1
-      python ./common/get_ace.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --projectId $Env:PROJECT_ID --namespaceId 'c788c23e-1b46-4162-8f5e-d7585343b5de' --groupName $(developers-group-name) --groupAce $(developers-group-ace) --allow $(developers-release-allow-permissions) --deny $(developers-release-deny-permissions) --pat $(onprem_pat)
+      python ./common/get_permissions.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --projectId $Env:PROJECT_ID --namespaceId 'c788c23e-1b46-4162-8f5e-d7585343b5de' --groupName $(developers-group-name) --groupSid $(developers-group-sid) --allow $(developers-release-allow-permissions) --deny $(developers-release-deny-permissions) --pat $(onprem_pat)
     displayName: 'Check Release permissions for $(projectName)-developers group'
     continueOnError: true
     env:
@@ -296,7 +296,7 @@ jobs:
 
   - powershell: |
       sleep 1
-      python ./common/get_ace.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --projectId $Env:PROJECT_ID --namespaceId 'c788c23e-1b46-4162-8f5e-d7585343b5de' --groupName $(auditors-group-name) --groupAce $(auditors-group-ace) --allow $(auditors-release-allow-permissions) --deny $(auditors-release-deny-permissions) --pat $(onprem_pat)
+      python ./common/get_permissions.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --projectId $Env:PROJECT_ID --namespaceId 'c788c23e-1b46-4162-8f5e-d7585343b5de' --groupName $(auditors-group-name) --groupSid $(auditors-group-sid) --allow $(auditors-release-allow-permissions) --deny $(auditors-release-deny-permissions) --pat $(onprem_pat)
     displayName: 'Check Release permissions for $(projectName)-auditors group'
     continueOnError: true
     env:
@@ -304,7 +304,7 @@ jobs:
 
   - powershell: |
       sleep 1
-      python ./common/get_ace.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --projectId $Env:PROJECT_ID --namespaceId 'c788c23e-1b46-4162-8f5e-d7585343b5de' --groupName $(product-owners-group-name) --groupAce $(product-owners-group-ace) --allow $(product-owners-release-allow-permissions) --deny $(product-owners-release-deny-permissions) --pat $(onprem_pat)
+      python ./common/get_permissions.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --projectId $Env:PROJECT_ID --namespaceId 'c788c23e-1b46-4162-8f5e-d7585343b5de' --groupName $(product-owners-group-name) --groupSid $(product-owners-group-sid) --allow $(product-owners-release-allow-permissions) --deny $(product-owners-release-deny-permissions) --pat $(onprem_pat)
     displayName: 'Check Release permissions for $(projectName)-product-owners group'
     continueOnError: true
     env:
@@ -318,7 +318,7 @@ jobs:
 
   - powershell: |
       sleep 1
-      python ./common/get_feed_acl.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --groupName $(administrators-group-name) --groupAce $(administrators-group-ace) --feedId $Env:FEED_ID --role $(administrators-feed-permissions) --pat $(onprem_pat)
+      python ./common/get_feed_acl.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --groupName $(administrators-group-name) --groupSid $(administrators-group-sid) --feedId $Env:FEED_ID --role $(administrators-feed-permissions) --pat $(onprem_pat)
     displayName: 'Check Feed permissions for $(projectName)-administrators group'
     continueOnError: true
     env:
@@ -326,7 +326,7 @@ jobs:
 
   - powershell: |
       sleep 1
-      python ./common/get_feed_acl.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --groupName $(developers-group-name) --groupAce $(developers-group-ace) --feedId $Env:FEED_ID --role $(developers-feed-permissions) --pat $(onprem_pat)
+      python ./common/get_feed_acl.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --groupName $(developers-group-name) --groupSid $(developers-group-sid) --feedId $Env:FEED_ID --role $(developers-feed-permissions) --pat $(onprem_pat)
     displayName: 'Check Feed permissions for $(projectName)-developers group'
     continueOnError: true
     env:
@@ -334,7 +334,7 @@ jobs:
 
   - powershell: |
       sleep 1
-      python ./common/get_feed_acl.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --groupName $(auditors-group-name) --groupAce $(auditors-group-ace) --feedId $Env:FEED_ID --role $(auditors-feed-permissions) --pat $(onprem_pat)
+      python ./common/get_feed_acl.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --groupName $(auditors-group-name) --groupSid $(auditors-group-sid) --feedId $Env:FEED_ID --role $(auditors-feed-permissions) --pat $(onprem_pat)
     displayName: 'Check Feed permissions for $(projectName)-auditors group'
     continueOnError: true
     env:
@@ -342,7 +342,7 @@ jobs:
 
   - powershell: |
       sleep 1
-      python ./common/get_feed_acl.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --groupName $(product-owners-group-name) --groupAce $(product-owners-group-ace) --feedId $Env:FEED_ID --role $(product-owners-feed-permissions) --pat $(onprem_pat)
+      python ./common/get_feed_acl.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --groupName $(product-owners-group-name) --groupSid $(product-owners-group-sid) --feedId $Env:FEED_ID --role $(product-owners-feed-permissions) --pat $(onprem_pat)
     displayName: 'Check Feed permissions for $(projectName)-product-owners group'
     continueOnError: true
     env:

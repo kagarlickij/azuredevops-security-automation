@@ -10,18 +10,18 @@ PARSER.add_argument('--organization', type=str)
 PARSER.add_argument('--feedId', type=str)
 PARSER.add_argument('--projectName', type=str)
 PARSER.add_argument('--groupName', type=str)
-PARSER.add_argument('--groupAce', type=str)
+PARSER.add_argument('--groupSid', type=str)
 PARSER.add_argument('--role', type=str)
 PARSER.add_argument('--pat', type=str)
 
 ARGS = PARSER.parse_args()
 
-if not ARGS.feedId or not ARGS.groupName or not ARGS.groupAce or not ARGS.role or not ARGS.pat:
+if not ARGS.feedId or not ARGS.groupName or not ARGS.groupSid or not ARGS.role or not ARGS.pat:
     print(f'##vso[task.logissue type=error] missing required arguments')
     sys.exit(1)
 
-ACE = (os.environ[(ARGS.groupAce).upper()])
-FULL_ACE = f'Microsoft.TeamFoundation.Identity;{ACE}'
+SID = (os.environ[(ARGS.groupSid).upper()])
+DESCRIPTOR = f'Microsoft.TeamFoundation.Identity;{SID}'
 
 if not ARGS.projectName:
     print(f'[INFO] no projectName received, so working with on-prem API')
@@ -49,7 +49,7 @@ else:
     CURRENT_ACL = RESPONSE.json()['value']
 
     for IDENTITY in CURRENT_ACL:
-        if IDENTITY['identityDescriptor'] == FULL_ACE:
+        if IDENTITY['identityDescriptor'] == DESCRIPTOR:
             CURRENT_ROLE = IDENTITY['role']
             break
 

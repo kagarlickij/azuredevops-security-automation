@@ -10,17 +10,17 @@ PARSER.add_argument('--organization', type=str)
 PARSER.add_argument('--feedId', type=str)
 PARSER.add_argument('--projectName', type=str)
 PARSER.add_argument('--groupName', type=str)
-PARSER.add_argument('--groupAce', type=str)
+PARSER.add_argument('--groupSid', type=str)
 PARSER.add_argument('--role', type=str)
 PARSER.add_argument('--pat', type=str)
 
 ARGS = PARSER.parse_args()
 
-if not ARGS.feedId or not ARGS.groupName or not ARGS.groupAce or not ARGS.role or not ARGS.pat:
+if not ARGS.feedId or not ARGS.groupName or not ARGS.groupSid or not ARGS.role or not ARGS.pat:
     print(f'##vso[task.logissue type=error] missing required arguments')
     sys.exit(1)
 
-ACE = (os.environ[(ARGS.groupAce).upper()])
+SID = (os.environ[(ARGS.groupSid).upper()])
 
 if not ARGS.projectName:
     print(f'[INFO] no projectName received, so working with on-prem API')
@@ -48,14 +48,14 @@ else:
     CURRENT_ACL = RESPONSE.json()
     ACCESS_DICT = CURRENT_ACL['value'][0]
 
-    NEW_ACE = {
+    ACE = {
         'role': f'{ARGS.role}',
-        'identityDescriptor': f'Microsoft.TeamFoundation.Identity;{ACE}',
+        'identityDescriptor': f'Microsoft.TeamFoundation.Identity;{SID}',
         'displayName': 'None',
         'isInheritedRole': 'False'
     }
 
-    DESIRED_ACL = [NEW_ACE]
+    DESIRED_ACL = [ACE]
 
     print(f'[INFO] Setting permissions for {ARGS.groupName} group..')
     try:

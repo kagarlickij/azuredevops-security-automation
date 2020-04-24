@@ -37,8 +37,8 @@ Here's summary of scripts vs used APIs (actions should be understandable from sc
 `https://dev.azure.com` version `5.0` (can be switched to `5.1` if necessary):
 1. [./cloud/create_project](./common/create_project.py)
 2. [./cloud/export_project](./cloud/export_project.py)
-3. [./cloud/get_ace](./common/get_ace.py)
-4. [./cloud/set_ace](./common/set_ace.py)
+3. [./cloud/get_ace](./common/get_permissions.py)
+4. [./cloud/set_ace](./common/set_permissions.py)
 
 `https://vssps.dev.azure.com` version `5.0-preview.1` vs TFSSecurity CLI:
 1. [./cloud/create_group](./cloud/create_group.py)
@@ -110,7 +110,7 @@ For Project namespace token format is `$PROJECT:vstfs:///Classification/TeamProj
 For Git Repositories namespace token format is `repoV2/{projectId}`  
 For AnalyticsViews namespace token format is `$/Shared/{projectId}`  
 For Build and ReleaseManagement it's just `{projectId}`  
-Those reflected in [./cloud/get_ace](./common/get_ace.py) and [./cloud/set_ace](./common/set_ace.py) conditions  
+Those reflected in [./cloud/get_ace](./common/get_permissions.py) and [./cloud/set_ace](./common/set_permissions.py) conditions  
 
 ## Numbers for permissions
 Permissions for majority of resources are present as sum of "bits" (numbers) for actions in namespace  
@@ -166,14 +166,14 @@ Exports group ACE as a var for further usage
 Format of ACE from time to time causes incorrect padding in Python so [fix](https://stackoverflow.com/questions/2941995/python-ignore-incorrect-padding-error-when-base64-decoding) is applied  
 
 7. Set Project permissions for each group  
-Here's the first time when [./common/set_ace.py](./common/set_ace.py) script comes into the game  
+Here's the first time when [./common/set_permissions.py](./common/set_permissions.py) script comes into the game  
 It will be used to set almost all permissions so threat it with extra care  
 
 8. Set Analytics permissions for each group  
 Analytics views are located in the same UI section Project permissions but have different security namespace and token format  
 
 9. Set Git permissions for each group  
-This security namespace also has different token format and [./common/set_ace.py](./common/set_ace.py) knows about that  
+This security namespace also has different token format and [./common/set_permissions.py](./common/set_permissions.py) knows about that  
 
 10. Set Build permissions for each group  
 Nothing too special here, token in this security namespace is equal to project id
@@ -190,7 +190,7 @@ Feed is created for specific project only, it has default capabilities and upstr
 
 14. Set feed permissions
 As described above, feeds use roles instead of permissions "bits" and `https://feeds.dev.azure.com` instead of `https://dev.azure.com/`  
-So dedicated [./cloud/set_feed_acl.py](./cloud/set_feed_acl.py) script is used instead of [./common/set_ace.py](./common/set_ace.py)  
+So dedicated [./cloud/set_feed_acl.py](./cloud/set_feed_acl.py) script is used instead of [./common/set_permissions.py](./common/set_permissions.py)  
 
 # `check-project` pipeline
 1. Export project-related info  
@@ -209,14 +209,14 @@ Exports group ACE as a var for further usage
 Format of ACE from time to time causes incorrect padding in Python so [fix](https://stackoverflow.com/questions/2941995/python-ignore-incorrect-padding-error-when-base64-decoding) is applied  
 
 5. Check Project permissions for each group  
-[./common/get_ace.py](./common/get_ace.py) script will check if current permissions match desired  
-As well as [./common/set_ace.py](./common/set_ace.py) [./common/get_ace.py](./common/get_ace.py) knows about different tokens for different security namespaces  
+[./common/get_permissions.py](./common/get_permissions.py) script will check if current permissions match desired  
+As well as [./common/set_permissions.py](./common/set_permissions.py) [./common/get_permissions.py](./common/get_permissions.py) knows about different tokens for different security namespaces  
 
 6. Check Analytics permissions for each group  
-[./common/get_ace.py](./common/get_ace.py) script will check if current permissions match desired  
+[./common/get_permissions.py](./common/get_permissions.py) script will check if current permissions match desired  
 
 7. Check Git permissions for each group  
-[./common/get_ace.py](./common/get_ace.py) script will check if current permissions match desired  
+[./common/get_permissions.py](./common/get_permissions.py) script will check if current permissions match desired  
 
 8. Check Git repos settings [task](./cloud/check_git_repos.py) performs the following checks on all repos in the project:  
 Check if all branches follow naming standards: allowed names are `master`, `feature/` and `bugfix/`  
@@ -227,16 +227,16 @@ The latest one checks if `master` branch has at least one policy assigned, and i
 Some repos can be excluded from checking by putting name to [excluded_repos.txt](excluded_repos.txt) file  
 
 9. Check Build permissions for each group  
-[./common/get_ace.py](./common/get_ace.py) script will check if current permissions match desired  
+[./common/get_permissions.py](./common/get_permissions.py) script will check if current permissions match desired  
 
 10. Check Release permissions for each group  
-[./common/get_ace.py](./common/get_ace.py) script will check if current permissions match desired  
+[./common/get_permissions.py](./common/get_permissions.py) script will check if current permissions match desired  
 
 11. Export feed info  
 `FEED_ID` var is exported for further usage  
 
 11. Check Artifact feed permissions for each group  
-[./cloud/get_feed_acl.py](./cloud/get_feed_acl.py) script is used instead of [./common/get_ace.py](./common/get_ace.py) because of `https://feeds.dev.azure.com` API is used  
+[./cloud/get_feed_acl.py](./cloud/get_feed_acl.py) script is used instead of [./common/get_permissions.py](./common/get_permissions.py) because of `https://feeds.dev.azure.com` API is used  
 
 # Pipelines execution
 ## Triggers
@@ -256,13 +256,13 @@ This is the reason why permissions for Variable groups are not set by `create-pr
 `ados-group-names-$projectName` group contains names of custom groups to create and names of ACEs to use as environment variable names, example:  
 | Name | Value |
 | ------------- | ------------- |
-| administrators-group-ace | $(administrators-group-name)-ace |
+| administrators-group-sid | $(administrators-group-name)-ace |
 | administrators-group-name | $(projectName)-administrators |
-| auditors-group-ace | $(auditors-group-name)-ace |
+| auditors-group-sid | $(auditors-group-name)-ace |
 | auditors-group-name | $(projectName)-auditors |
-| developers-group-ace | $(developers-group-name)-ace |
+| developers-group-sid | $(developers-group-name)-ace |
 | developers-group-name | $(projectName)-developers |
-| product-owners-group-ace | $(product-owners-group-name)-ace |
+| product-owners-group-sid | $(product-owners-group-name)-ace |
 | product-owners-group-name | $(projectName)-product-owners |
 
 If you want to add more groups or remove some of existing don't forget to change both variable group and pipeline's tasks
