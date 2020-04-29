@@ -1,0 +1,25 @@
+- repo: local
+  hooks:
+    - id: black
+      name: Code format with Black
+      entry: black
+      args:
+        - .
+      language: system
+      types:
+        - python
+      stages:
+        - commit
+    - id: bandit
+      name: Security check with Bandit
+      entry: bandit
+      args:
+        - '--recursive'
+        - '--exclude'
+        - "./generate_pylint_badge.py"
+        - .
+      language: system
+      types:
+        - python
+      stages:
+        - push

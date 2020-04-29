@@ -334,3 +334,6 @@ However some Azure DevOps specific syntax is present in scripts:
 1. All `print` functions have `[INFO]` or `[ERROR]` prefixes to make output more readable and properly [colored in Azure DevOps logs](https://developercommunity.visualstudio.com/content/problem/440605/write-host-foreground-color-with-powershell-task-i.html), [example](https://prnt.sc/rqzu2x)  
 However it is not supported in <span style="color:red">Azure DevOps Server v2019.Update1.1</span>  
 2. Environment variables are set via [`task.setvariable` logging command](https://docs.microsoft.com/en-us/azure/devops/pipelines/process/variables?view=azure-devops&tabs=yaml%2Cbatch#set-variables-in-scripts)  
+
+# Linting
+pre-commit install && pre-commit install -t pre-push

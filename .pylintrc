@@ -1,6 +1,7 @@
 [MASTER]
 disable=
     R0801, # duplicate-code
+    C0330, # bad-continuation because it's false positive - https://github.com/PyCQA/pylint/issues/289
 
 [FORMAT]
 max-line-length=200
