@@ -1,3 +1,7 @@
+"""
+This script creates new Artifact feed
+"""
+
 import json
 import argparse
 import sys
@@ -5,23 +9,21 @@ import requests
 
 PARSER = argparse.ArgumentParser()
 
-PARSER.add_argument('--organization', type=str)
+PARSER.add_argument('--organization', type=str, required=True)
 PARSER.add_argument('--projectName', type=str)
-PARSER.add_argument('--feedName', type=str)
-PARSER.add_argument('--pat', type=str)
+PARSER.add_argument('--feedName', type=str, required=True)
+PARSER.add_argument('--pat', type=str, required=True)
 
 ARGS = PARSER.parse_args()
 
-if not ARGS.feedName or not ARGS.pat:
-    print(f'##vso[task.logissue type=error] missing required arguments')
-    sys.exit(1)
-
 if not ARGS.projectName:
-    print(f'[INFO] no projectName received, so working with on-prem API')
-    URL = '{}/_apis/packaging/feeds?api-version=5.0-preview.1'.format(ARGS.organization)
+    print('[INFO] no projectName received, so working with on-prem API')
+    URL = ('{}/_apis/packaging/feeds?api-version=5.0-preview.1'
+           .format(ARGS.organization))
 else:
-    print(f'[INFO] projectName received, so working with cloud API')
-    URL = '{}/{}/_apis/packaging/feeds?api-version=5.0-preview.1'.format(ARGS.organization, ARGS.projectName)
+    print('[INFO] projectName received, so working with cloud API')
+    URL = ('{}/{}/_apis/packaging/feeds?api-version=5.0-preview.1'
+           .format(ARGS.organization, ARGS.projectName))
 
 HEADERS = {
     'Content-Type': 'application/json',
@@ -35,9 +37,9 @@ DATA = {
 
 print(f'[INFO] Creating {ARGS.feedName} feed..')
 try:
-    RESPONSE = requests.post(URL, headers=HEADERS, data=json.dumps(DATA), auth=(ARGS.pat,''))
+    RESPONSE = requests.post(URL, headers=HEADERS, data=json.dumps(DATA), auth=(ARGS.pat, ''))
     RESPONSE.raise_for_status()
-except Exception as err:
+except requests.exceptions.RequestException as err:
     print(f'##vso[task.logissue type=error] {err}')
     RESPONSE_TEXT = json.loads(RESPONSE.text)
     CODE = RESPONSE_TEXT['errorCode']

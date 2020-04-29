@@ -1,3 +1,7 @@
+"""
+This script creates group in projct via Azure DevOps API
+"""
+
 import json
 import argparse
 import sys
@@ -5,20 +9,17 @@ import requests
 
 PARSER = argparse.ArgumentParser()
 
-PARSER.add_argument('--organization', type=str)
-PARSER.add_argument('--projectScopeDescriptor', type=str)
-PARSER.add_argument('--groupName', type=str)
-PARSER.add_argument('--groupDescription', type=str)
-PARSER.add_argument('--pat', type=str)
+PARSER.add_argument('--organization', type=str, required=True)
+PARSER.add_argument('--projectScopeDescriptor', type=str, required=True)
+PARSER.add_argument('--groupName', type=str, required=True)
+PARSER.add_argument('--groupDescription', type=str, required=True)
+PARSER.add_argument('--pat', type=str, required=True)
 
 ARGS = PARSER.parse_args()
 
-if not ARGS.projectScopeDescriptor or not ARGS.groupName or not ARGS.groupDescription or not ARGS.pat:
-    print(f'##vso[task.logissue type=error] missing required arguments')
-    sys.exit(1)
-
 print(f'[INFO] Creating {ARGS.groupName} group..')
-URL = '{}/_apis/graph/groups?scopeDescriptor={}&api-version=5.0-preview.1'.format(ARGS.organization, ARGS.projectScopeDescriptor)
+URL = ('{}/_apis/graph/groups?scopeDescriptor={}&api-version=5.0-preview.1'
+       .format(ARGS.organization, ARGS.projectScopeDescriptor))
 HEADERS = {
     'Content-Type': 'application/json',
 }
@@ -29,9 +30,9 @@ DATA = {
 }
 
 try:
-    RESPONSE = requests.post(URL, headers=HEADERS, data=json.dumps(DATA), auth=(ARGS.pat,''))
+    RESPONSE = requests.post(URL, headers=HEADERS, data=json.dumps(DATA), auth=(ARGS.pat, ''))
     RESPONSE.raise_for_status()
-except Exception as err:
+except requests.exceptions.RequestException as err:
     print(f'##vso[task.logissue type=error] {err}')
     RESPONSE_TEXT = json.loads(RESPONSE.text)
     CODE = RESPONSE_TEXT['errorCode']

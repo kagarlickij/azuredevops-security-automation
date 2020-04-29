@@ -1,3 +1,7 @@
+"""
+This script creates new Azure DevOps project
+"""
+
 import json
 import argparse
 import sys
@@ -5,27 +9,24 @@ import requests
 
 PARSER = argparse.ArgumentParser()
 
-PARSER.add_argument('--organization', type=str)
-PARSER.add_argument('--projectName', type=str)
-PARSER.add_argument('--projectDescription', type=str)
+PARSER.add_argument('--organization', type=str, required=True)
+PARSER.add_argument('--projectName', type=str, required=True)
+PARSER.add_argument('--projectDescription', type=str, required=False)
 PARSER.add_argument('--processTemplate', type=str, default='6b724908-ef14-45cf-84f8-768b5384da45')
-PARSER.add_argument('--pat', type=str)
+PARSER.add_argument('--pat', type=str, required=True)
 
 ARGS = PARSER.parse_args()
 
-if not ARGS.organization or not ARGS.projectName or not ARGS.pat:
-    print(f'##vso[task.logissue type=error] missing required arguments')
-    sys.exit(1)
-
-URL = '{}/_apis/projects?api-version=5.0'.format(ARGS.organization)
+URL = ('{}/_apis/projects?api-version=5.0'
+       .format(ARGS.organization))
 HEADERS = {
     'Content-Type': 'application/json',
 }
 
 try:
-    RESPONSE = requests.get(URL, headers=HEADERS, auth=(ARGS.pat,''))
+    RESPONSE = requests.get(URL, headers=HEADERS, auth=(ARGS.pat, ''))
     RESPONSE.raise_for_status()
-except Exception as err:
+except requests.exceptions.RequestException as err:
     print(f'##vso[task.logissue type=error] {err}')
     RESPONSE_TEXT = json.loads(RESPONSE.text)
     CODE = RESPONSE_TEXT['errorCode']
@@ -43,7 +44,8 @@ else:
     print(f'[INFO] project {ARGS.projectName} does not exist yet, ok to proceed')
 
 print(f'[INFO] Creating {ARGS.projectName} project..')
-URL = '{}/_apis/projects?api-version=5.0'.format(ARGS.organization)
+URL = ('{}/_apis/projects?api-version=5.0'
+       .format(ARGS.organization))
 HEADERS = {
     'Content-Type': 'application/json',
 }
@@ -63,9 +65,9 @@ DATA = {
 }
 
 try:
-    RESPONSE = requests.post(URL, headers=HEADERS, data=json.dumps(DATA), auth=(ARGS.pat,''))
+    RESPONSE = requests.post(URL, headers=HEADERS, data=json.dumps(DATA), auth=(ARGS.pat, ''))
     RESPONSE.raise_for_status()
-except Exception as err:
+except requests.exceptions.RequestException as err:
     print(f'##vso[task.logissue type=error] {err}')
     RESPONSE_TEXT = json.loads(RESPONSE.text)
     CODE = RESPONSE_TEXT['errorCode']

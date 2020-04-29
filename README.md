@@ -1,6 +1,6 @@
 | Build status | pylint Score | License |
 | ------------- | ------------- | ------------- |
-| [![Build Status](https://dev.azure.com/kagarlickij/test/_apis/build/status/create-project?branchName=master)](https://dev.azure.com/kagarlickij/test/_build/latest?definitionId=44&branchName=master) | ![pylint Score](https://mperlet.github.io/pybadge/badges/9.59.svg) | [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE.md) |
+| [![Build Status](https://dev.azure.com/kagarlickij/test/_apis/build/status/create-project?branchName=master)](https://dev.azure.com/kagarlickij/test/_build/latest?definitionId=44&branchName=master) | ![pylint Score](https://gist.githubusercontent.com/kagarlickij/780fabe68201e08c8f2151ad02898bad/raw/pylint.svg) | [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE.md) |
 
 # Challenge
 Azure DevOps gives a nice opportunity to have dedicated projects for dedicated teams and/or projects  
@@ -80,7 +80,7 @@ So I added those ugly `sleep 1` actions to all pipeline's tasks and a few tasks 
 
 ## Response codes
 Azure DevOps API can respond with `2**` codes - some of them stand for real success (e.g. resource created) but some mean that call was answered  
-To address this situation some scripts use not only `Exception` for `requests` but also check `status_code` of the response to match desired e.g. `204` in `delete_group`
+To address this situation some scripts use not only `requests.exceptions.RequestException` for `requests` but also check `status_code` of the response to match desired e.g. `204` in `delete_group`
 
 ## Organization
 All scripts have `--organization` parameter but pipelines don't insert it because default value is name of my Azure DevOps organization - `kagarlickij`  

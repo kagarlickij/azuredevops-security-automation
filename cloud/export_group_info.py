@@ -1,3 +1,7 @@
+"""
+This script gets and exports SID of the Azure DevOps group
+"""
+
 import json
 import argparse
 import sys
@@ -14,19 +18,23 @@ PARSER.add_argument('--pat', type=str)
 
 ARGS = PARSER.parse_args()
 
-if not ARGS.projectScopeDescriptor or not ARGS.groupName or not ARGS.groupSid or not ARGS.pat:
-    print(f'##vso[task.logissue type=error] missing required arguments')
+if (not ARGS.projectScopeDescriptor
+        or not ARGS.groupName
+        or not ARGS.groupSid
+        or not ARGS.pat):
+    print('##vso[task.logissue type=error] missing required arguments')
     sys.exit(1)
 
-URL = '{}/_apis/graph/groups?scopeDescriptor={}&api-version=5.0-preview.1'.format(ARGS.organization, ARGS.projectScopeDescriptor)
+URL = ('{}/_apis/graph/groups?scopeDescriptor={}&api-version=5.0-preview.1'
+       .format(ARGS.organization, ARGS.projectScopeDescriptor))
 HEADERS = {
     'Content-Type': 'application/json',
 }
 
 try:
-    RESPONSE = requests.get(URL, headers=HEADERS, auth=(ARGS.pat,''))
+    RESPONSE = requests.get(URL, headers=HEADERS, auth=(ARGS.pat, ''))
     RESPONSE.raise_for_status()
-except Exception as err:
+except requests.exceptions.RequestException as err:
     print(f'##vso[task.logissue type=error] {err}')
     RESPONSE_TEXT = json.loads(RESPONSE.text)
     CODE = RESPONSE_TEXT['errorCode']
@@ -49,7 +57,7 @@ else:
         sys.exit(1)
     else:
         print(f'[INFO] Checking {ARGS.groupName} group..')
-        DESCRIPTOR = GROUP_DESCRIPTOR.split('vssgp.',1)[1]
+        DESCRIPTOR = GROUP_DESCRIPTOR.split('vssgp.', 1)[1]
 
         for SYM in DESCRIPTOR.split('.'):
             SID = base64.b64decode(SYM + '=' * (-len(SYM) % 4)).decode('utf-8')

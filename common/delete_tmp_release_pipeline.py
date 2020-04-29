@@ -1,3 +1,7 @@
+"""
+This script deletes temporary Release pipeline
+"""
+
 import json
 import argparse
 import sys
@@ -5,26 +9,23 @@ import requests
 
 PARSER = argparse.ArgumentParser()
 
-PARSER.add_argument('--organization', type=str)
-PARSER.add_argument('--projectName', type=str)
-PARSER.add_argument('--pat', type=str)
+PARSER.add_argument('--organization', type=str, required=True)
+PARSER.add_argument('--projectName', type=str, required=True)
+PARSER.add_argument('--pat', type=str, required=True)
 
 ARGS = PARSER.parse_args()
 
-if not ARGS.projectName or not ARGS.pat:
-    print(f'##vso[task.logissue type=error] missing required arguments')
-    sys.exit(1)
-
-print(f'[INFO] Deleting tmp Release pipeline..')
-URL = '{}/{}/_apis/release/definitions/1?api-version=5.0'.format(ARGS.organization, ARGS.projectName)
+print('[INFO] Deleting tmp Release pipeline..')
+URL = ('{}/{}/_apis/release/definitions/1?api-version=5.0'
+       .format(ARGS.organization, ARGS.projectName))
 HEADERS = {
     'Content-Type': 'application/json',
 }
 
 try:
-    RESPONSE = requests.delete(URL, headers=HEADERS, auth=(ARGS.pat,''))
+    RESPONSE = requests.delete(URL, headers=HEADERS, auth=(ARGS.pat, ''))
     RESPONSE.raise_for_status()
-except Exception as err:
+except requests.exceptions.RequestException as err:
     print(f'##vso[task.logissue type=error] {err}')
     RESPONSE_TEXT = json.loads(RESPONSE.text)
     CODE = RESPONSE_TEXT['errorCode']
@@ -35,7 +36,7 @@ except Exception as err:
 else:
     RESPONSE_CODE = RESPONSE.status_code
     if RESPONSE_CODE == 204:
-        print(f'[INFO] tmp Release pipeline has been deleted successfully')
+        print('[INFO] tmp Release pipeline has been deleted successfully')
     else:
-        print(f'##vso[task.logissue type=error] tmp Release pipeline has not been deleted')
+        print('##vso[task.logissue type=error] tmp Release pipeline has not been deleted')
         sys.exit(1)

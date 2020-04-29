@@ -1,16 +1,16 @@
+"""
+This script gets and exports SID of the Azure DevOps group
+"""
+
 import argparse
 import sys
 
 PARSER = argparse.ArgumentParser()
 
-PARSER.add_argument('--groupName', type=str)
-PARSER.add_argument('--groupSid', type=str)
+PARSER.add_argument('--groupName', type=str, required=True)
+PARSER.add_argument('--groupSid', type=str, required=True)
 
 ARGS = PARSER.parse_args()
-
-if not ARGS.groupName or not ARGS.groupSid:
-    print(f'##vso[task.logissue type=error] missing required arguments')
-    sys.exit(1)
 
 LIST_GROUPS_OUTPUT = open('groups_list.txt', "r")
 LIST_GROUPS_OUTPUT_READ = LIST_GROUPS_OUTPUT.read()

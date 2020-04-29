@@ -22,7 +22,7 @@ schedules:
 
 variables:
 - name: projectName
-  value: 'templ-test28'
+  value: 'templ-test30'
 
 - group: ados-group-names-templ-test01
 - group: ados-acls-templ-test01

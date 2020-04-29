@@ -1,0 +1,72 @@
+resources:
+- repo: self
+  clean: true
+
+trigger:
+  batch: true
+  branches:
+    include:
+    - master
+
+pr:
+  autoCancel: false
+  branches:
+    include:
+    - master
+
+variables:
+- name: gistId
+  value: '780fabe68201e08c8f2151ad02898bad'
+
+- group: github-secrets
+
+jobs:
+- job: prv
+  condition: eq(variables['System.PullRequest.TargetBranch'], 'refs/heads/master')
+  pool:
+    vmImage: 'ubuntu-latest'
+  steps:
+  - powershell: |
+      Install-Module -Name PSScriptAnalyzer -Force
+    displayName: 'Install PowerShell linter'
+  - powershell: |
+      Invoke-ScriptAnalyzer -Path ./onprem/*.ps1 -Severity Error,ParseError,Warning | Tee-Object -Variable lintResults
+      if (!$lintResults) {
+          Write-Output "PowerShell linter didn't found any issues"
+      } else {
+          Write-Output "PowerShell linter found issues, please fix"
+          exit 1
+      }
+    displayName: 'Run PowerShell linter'
+  - task: UsePythonVersion@0
+    displayName: 'Use Python 3.x'
+  - bash: |
+      pip install -r requirements.txt
+    displayName: 'Install Python requirements'
+  - bash: |
+      pip install -Iv pylint==2.5.0
+      pip install -Iv pylint-fail-under==0.3.0
+    displayName: 'Install Python linter'
+  - bash: |
+      pylint-fail-under --fail_under 8.00 ./**/*.py
+    displayName: 'Run Python linter'
+
+- job: build
+  condition: and(ne(variables['Build.Reason'], 'PullRequest'), contains(variables['Build.SourceBranch'], 'refs/heads/master'))
+  pool:
+    vmImage: 'ubuntu-latest'
+  steps:
+  - task: UsePythonVersion@0
+    displayName: 'Use Python 3.x'
+  - bash: |
+      pip install -r requirements.txt
+    displayName: 'Install Python requirements'
+  - bash: |
+      pip install -Iv pylint==2.5.0
+      pip install -I anybadge
+    displayName: 'Install pylint and anybadge'
+  - task: PythonScript@0
+    displayName: 'Generate pylint badge'
+    inputs:
+      scriptPath: ./generate_pylint_badge.py
+      arguments: '--gistId $(gistId) --gitHubPat $(gitHubPat)'
