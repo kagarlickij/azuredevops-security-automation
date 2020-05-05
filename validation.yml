@@ -44,11 +44,11 @@ jobs:
     inputs:
       versionSpec: 3.7.x
   - bash: |
-      pip install -r requirements.txt
+      pip install --disable-pip-version-check --ignore-installed --quiet --requirement requirements.txt
     displayName: 'Install Python requirements'
   - bash: |
-      pip install -Iv pylint-fail-under==0.3.0
-      pip install -Iv pylint==2.5.0
+      pip install --disable-pip-version-check --ignore-installed --quiet --version pylint-fail-under==0.3.0
+      pip install --disable-pip-version-check --ignore-installed --quiet --version pylint==2.5.0 #Latest pylint has an issue - https://github.com/TNThieding/pylint-fail-under/issues/8
     displayName: 'Install Python linter'
   - bash: |
       pylint-fail-under --fail_under 8.00 ./**/*.py
@@ -60,13 +60,15 @@ jobs:
     vmImage: 'ubuntu-latest'
   steps:
   - task: UsePythonVersion@0
-    displayName: 'Use Python 3.x'
+    displayName: 'Use Python 3.7.x'
+    inputs:
+      versionSpec: 3.7.x
   - bash: |
-      pip install -r requirements.txt
+      pip install --disable-pip-version-check --ignore-installed --quiet --requirement requirements.txt
     displayName: 'Install Python requirements'
   - bash: |
-      pip install -Iv pylint==2.5.0
-      pip install -I anybadge
+      pip install --disable-pip-version-check --ignore-installed --quiet --version pylint==2.5.0
+      pip install --disable-pip-version-check --ignore-installed --quiet anybadge
     displayName: 'Install pylint and anybadge'
   - task: PythonScript@0
     displayName: 'Generate pylint badge'

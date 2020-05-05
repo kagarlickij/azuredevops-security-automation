@@ -15,7 +15,7 @@ pr:
 
 variables:
 - name: projectName
-  value: 'templ-test31'
+  value: 'templ-test32'
 
 - group: ados-group-names-templ-test01
 - group: ados-acls-templ-test01
@@ -29,11 +29,13 @@ jobs:
     vmImage: 'ubuntu-latest'
   steps:
   - task: UsePythonVersion@0
-    displayName: 'Use Python 3.x'
+    displayName: 'Use Python 3.7.x'
+    inputs:
+      versionSpec: 3.7.x
 
 
   - bash: |
-      pip --disable-pip-version-check install --user -r requirements.txt
+      pip install --disable-pip-version-check --ignore-installed --quiet --user --requirement requirements.txt
     displayName: 'Install requirements'
 
 
