@@ -21,8 +21,9 @@ variables:
 - group: github-secrets
 
 jobs:
+
 - job: prv
-  condition: eq(variables['System.PullRequest.TargetBranch'], 'refs/heads/master')
+  condition: eq(variables['System.PullRequest.TargetBranch'], 'master')
   pool:
     vmImage: 'ubuntu-latest'
   steps:
@@ -39,13 +40,15 @@ jobs:
       }
     displayName: 'Run PowerShell linter'
   - task: UsePythonVersion@0
-    displayName: 'Use Python 3.x'
+    displayName: 'Use Python 3.7.x'
+    inputs:
+      versionSpec: 3.7.x
   - bash: |
       pip install -r requirements.txt
     displayName: 'Install Python requirements'
   - bash: |
-      pip install -Iv pylint==2.5.0
       pip install -Iv pylint-fail-under==0.3.0
+      pip install -Iv pylint==2.5.0
     displayName: 'Install Python linter'
   - bash: |
       pylint-fail-under --fail_under 8.00 ./**/*.py
