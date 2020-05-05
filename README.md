@@ -1,6 +1,6 @@
-| Build status | pylint Score | License |
-| ------------- | ------------- | ------------- |
-| [![Build Status](https://dev.azure.com/kagarlickij/test/_apis/build/status/create-project?branchName=master)](https://dev.azure.com/kagarlickij/test/_build/latest?definitionId=44&branchName=master) | ![pylint Score](https://gist.githubusercontent.com/kagarlickij/780fabe68201e08c8f2151ad02898bad/raw/pylint.svg) | [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE.md) |
+| Validation status | Create project status | Check project status | pylint Score | License |
+| ------------- | ------------- | ------------- | ------------- | ------------- |
+| [![Validation Status](https://dev.azure.com/kagarlickij/azuredevops-security-automation/_apis/build/status/validate?branchName=master)](https://dev.azure.com/kagarlickij/azuredevops-security-automation/_build/latest?definitionId=74&branchName=master) | [![Create project Status](https://dev.azure.com/kagarlickij/azuredevops-security-automation/_apis/build/status/create?branchName=master)](https://dev.azure.com/kagarlickij/azuredevops-security-automation/_build/latest?definitionId=71&branchName=master) | [![Check project Status](https://dev.azure.com/kagarlickij/azuredevops-security-automation/_apis/build/status/check?branchName=master)](https://dev.azure.com/kagarlickij/azuredevops-security-automation/_build/latest?definitionId=72&branchName=master) | ![pylint Score](https://gist.githubusercontent.com/kagarlickij/780fabe68201e08c8f2151ad02898bad/raw/pylint.svg) | [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE.md) |
 
 # Challenge
 Azure DevOps gives a nice opportunity to have dedicated projects for dedicated teams and/or projects  
