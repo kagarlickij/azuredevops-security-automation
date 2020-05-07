@@ -2,27 +2,38 @@
 This script gets list of current groups and compares it with list of desired groups
 """
 
+import subprocess
 import argparse
 import sys
 
 PARSER = argparse.ArgumentParser()
 
+PARSER.add_argument("--organization", type=str, required=True)
+PARSER.add_argument("--projectId", type=str, required=True)
 PARSER.add_argument("--desiredGroupsList", nargs="+", required=True)
 
 ARGS = PARSER.parse_args()
 
-DESIRED_GROUPS_LIST = ARGS.desiredGroupsList
+CMD = [
+    "C:\\Program Files\\Azure DevOps Server 2019\\Tools\\TFSSecurity.exe",
+    "/g",
+    f"vstfs:///Classification/TeamProject/{ARGS.projectId}",
+    f"/collection:{ARGS.organization}",
+]
 
-LIST_GROUPS_OUTPUT = open("groups_list.txt", "r")
-LIST_GROUPS_OUTPUT_READ = LIST_GROUPS_OUTPUT.read()
+LIST_GROUPS_OUTPUT = subprocess.run(
+    CMD, check=True, stdout=subprocess.PIPE, shell=True
+).stdout.decode("utf-8")
+
 CURRENT_GROUPS_LIST = list()
-for LINE in LIST_GROUPS_OUTPUT_READ.splitlines():
+for LINE in LIST_GROUPS_OUTPUT.splitlines():
     if "Display name" in LINE:
         GROUP_NAME = LINE.split("\\")[1]
         CURRENT_GROUPS_LIST.append(GROUP_NAME)
 
 print(f"[DEBUG] CURRENT_GROUPS_LIST: {CURRENT_GROUPS_LIST}")
 
+DESIRED_GROUPS_LIST = ARGS.desiredGroupsList
 DESIRED_GROUPS_LIST.sort()
 CURRENT_GROUPS_LIST.sort()
 

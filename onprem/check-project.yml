@@ -22,7 +22,7 @@ schedules:
 
 variables:
 - name: projectName
-  value: 'templ-test17'
+  value: 'templ-test21'
 
 - group: ados-group-names-templ-test01
 - group: ados-acls-templ-test01
@@ -49,49 +49,35 @@ jobs:
 
 
   - powershell: |
-      ./onprem/get_groups.ps1 -ORGANIZATION 'https://ados.demo.kagarlickij.com/DefaultCollection' -PROJECT_ID $Env:PROJECT_ID
-    displayName: 'Get list of all groups'
-    env:
-      PROJECT_ID: $(projectId)
-
-  - powershell: |
-      python ./onprem/get_groups.py --desiredGroupsList '$(administrators-group-name)' '$(developers-group-name)' '$(auditors-group-name)' '$(product-owners-group-name)' '$(projectName) Team' 'Project Administrators' 'Project Valid Users'
+      python ./onprem/get_groups.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --projectId $(projectId) --desiredGroupsList '$(administrators-group-name)' '$(developers-group-name)' '$(auditors-group-name)' '$(product-owners-group-name)' '$(projectName) Team' 'Project Administrators' 'Project Valid Users'
     displayName: 'Check list of groups'
     continueOnError: true
 
 
   - powershell: |
-      python ./onprem/export_group_info.py --groupName $(administrators-group-name) --groupSid $(administrators-group-sid)
+      python ./onprem/export_group_info.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --projectId $(projectId) --groupName $(administrators-group-name) --groupSid $(administrators-group-sid)
     displayName: 'Export $(projectName)-administrators group info'
 
   - powershell: |
-      python ./onprem/export_group_info.py --groupName $(developers-group-name) --groupSid $(developers-group-sid)
+      python ./onprem/export_group_info.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --projectId $(projectId) --groupName $(developers-group-name) --groupSid $(developers-group-sid)
     displayName: 'Export $(projectName)-developers group info'
 
   - powershell: |
-      python ./onprem/export_group_info.py --groupName $(auditors-group-name) --groupSid $(auditors-group-sid)
+      python ./onprem/export_group_info.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --projectId $(projectId) --groupName $(auditors-group-name) --groupSid $(auditors-group-sid)
     displayName: 'Export $(projectName)-auditors group info'
 
   - powershell: |
-      python ./onprem/export_group_info.py --groupName $(product-owners-group-name) --groupSid $(product-owners-group-sid)
+      python ./onprem/export_group_info.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --projectId $(projectId) --groupName $(product-owners-group-name) --groupSid $(product-owners-group-sid)
     displayName: 'Export $(projectName)-product-owners group info'
 
 
   - powershell: |
-      ./onprem/get_group_members.ps1 -ORGANIZATION 'https://ados.demo.kagarlickij.com/DefaultCollection' -PROJECT_NAME $(projectName) -GROUP_NAME 'Project Administrators'
-    displayName: 'Get Project Administrators group members'
-
-  - powershell: |
-      python ./onprem/get_group_members.py --groupName 'Project Administrators' --desiredMembersQuantity '1'
+      python ./onprem/get_group_members.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --projectName $(projectName) --groupName 'Project Administrators' --desiredMembersQuantity '1'
     displayName: 'Check Project Administrators group members'
     continueOnError: true
 
   - powershell: |
-      ./onprem/get_group_members.ps1 -ORGANIZATION 'https://ados.demo.kagarlickij.com/DefaultCollection' -PROJECT_NAME $(projectName) -GROUP_NAME 'Project Valid Users'
-    displayName: 'Get Project Valid Users group members'
-
-  - powershell: |
-      python ./onprem/get_group_members.py --groupName 'Project Valid Users' --desiredMembersQuantity '7'
+      python ./onprem/get_group_members.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --projectName $(projectName) --groupName 'Project Valid Users' --desiredMembersQuantity '7'
     displayName: 'Check Project Valid Users group members'
     continueOnError: true
 

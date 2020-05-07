@@ -17,6 +17,10 @@
         - '--recursive'
         - '--exclude'
         - "./generate_pylint_badge.py"
+        - '--skip'
+        - 'B602,B404'
+        - '--level'
+        - 'HIGH'
         - .
       language: system
       types:

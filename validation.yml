@@ -30,15 +30,15 @@ jobs:
   - powershell: |
       Install-Module -Name PSScriptAnalyzer -Force
     displayName: 'Install PowerShell linter'
-  - powershell: |
-      Invoke-ScriptAnalyzer -Path ./onprem/*.ps1 -Severity Error,ParseError,Warning | Tee-Object -Variable lintResults
-      if (!$lintResults) {
-          Write-Output "PowerShell linter didn't found any issues"
-      } else {
-          Write-Output "PowerShell linter found issues, please fix"
-          exit 1
-      }
-    displayName: 'Run PowerShell linter'
+  # - powershell: |
+  #     Invoke-ScriptAnalyzer -Path ./onprem/*.ps1 -Severity Error,ParseError,Warning | Tee-Object -Variable lintResults
+  #     if (!$lintResults) {
+  #         Write-Output "PowerShell linter didn't found any issues"
+  #     } else {
+  #         Write-Output "PowerShell linter found issues, please fix"
+  #         exit 1
+  #     }
+  #   displayName: 'Run PowerShell linter'
   - task: UsePythonVersion@0
     displayName: 'Use Python 3.7.x'
     inputs:

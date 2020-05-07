@@ -2,20 +2,32 @@
 This script gets current quantity of group members and compares it with desired
 """
 
+import subprocess
 import argparse
 import sys
 
 PARSER = argparse.ArgumentParser()
 
+PARSER.add_argument("--organization", type=str, required=True)
+PARSER.add_argument("--projectName", type=str, required=True)
 PARSER.add_argument("--groupName", type=str, required=True)
 PARSER.add_argument("--desiredMembersQuantity", type=str, required=True)
 
 ARGS = PARSER.parse_args()
 
-CURRENT_MEMBERS_FILE = open(f"{ARGS.groupName}_members.txt", "r")
-CURRENT_MEMBERS_FILE_READ = CURRENT_MEMBERS_FILE.read()
+CMD = [
+    "C:\\Program Files\\Azure DevOps Server 2019\\Tools\\TFSSecurity.exe",
+    "/imx",
+    f"[{ARGS.projectName}]\\{ARGS.groupName}",
+    f"/collection:{ARGS.organization}",
+]
+
+CURRENT_MEMBERS_OUTPUT = subprocess.run(
+    CMD, check=True, stdout=subprocess.PIPE, shell=True
+).stdout.decode("utf-8")
+
 CURRENT_MEMBERS_LINE = ""
-for LINE in CURRENT_MEMBERS_FILE_READ.splitlines():
+for LINE in CURRENT_MEMBERS_OUTPUT.splitlines():
     if "member(s):" in LINE:
         CURRENT_MEMBERS_LINE = LINE
         break
@@ -39,7 +51,5 @@ else:
     print(
         f"##vso[task.logissue type=error] Current members quantity = {CURRENT_MEMBERS_QUANTITY}"
     )
-    print(
-        f"##vso[task.logissue type=error] Current members = {CURRENT_MEMBERS_FILE_READ}"
-    )
+    print(f"##vso[task.logissue type=error] Current members = {CURRENT_MEMBERS_OUTPUT}")
     sys.exit(1)

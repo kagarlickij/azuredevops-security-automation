@@ -15,7 +15,7 @@ pr:
 
 variables:
 - name: projectName
-  value: 'templ-test17'
+  value: 'templ-test21'
 
 - group: ados-group-names-templ-test01
 - group: ados-acls-templ-test01
@@ -54,53 +54,37 @@ jobs:
 
 
   - powershell: |
-      ./onprem/delete_group.ps1 -ORGANIZATION 'https://ados.demo.kagarlickij.com/DefaultCollection' -PROJECT_NAME $(projectName) -GROUP_NAME 'Readers'
+      ./onprem/delete_group.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --projectName $(projectName) --groupName 'Readers'
     displayName: 'Delete built-in Readers group'
-    env:
-      PROJECT_SCOPE_DESCRIPTOR: $(projectScopeDescriptor)
 
   - powershell: |
-      ./onprem/delete_group.ps1 -ORGANIZATION 'https://ados.demo.kagarlickij.com/DefaultCollection' -PROJECT_NAME $(projectName) -GROUP_NAME 'Release Administrators'
+      ./onprem/delete_group.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --projectName $(projectName) --groupName 'Release Administrators'
     displayName: 'Delete built-in Release Administrators group'
-    env:
-      PROJECT_SCOPE_DESCRIPTOR: $(projectScopeDescriptor)
 
   - powershell: |
-      ./onprem/delete_group.ps1 -ORGANIZATION 'https://ados.demo.kagarlickij.com/DefaultCollection' -PROJECT_NAME $(projectName) -GROUP_NAME 'Build Administrators'
+      ./onprem/delete_group.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --projectName $(projectName) --groupName 'Build Administrators'
     displayName: 'Delete built-in Build Administrators group'
-    env:
-      PROJECT_SCOPE_DESCRIPTOR: $(projectScopeDescriptor)
 
   - powershell: |
-      ./onprem/delete_group.ps1 -ORGANIZATION 'https://ados.demo.kagarlickij.com/DefaultCollection' -PROJECT_NAME $(projectName) -GROUP_NAME 'Contributors'
+      ./onprem/delete_group.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --projectName $(projectName) --groupName 'Contributors'
     displayName: 'Delete built-in Contributors group'
-    env:
-      PROJECT_SCOPE_DESCRIPTOR: $(projectScopeDescriptor)
 
 
   - powershell: |
-      ./onprem/create_group.ps1 -ORGANIZATION 'https://ados.demo.kagarlickij.com/DefaultCollection' -PROJECT_ID $Env:PROJECT_ID -GROUP_NAME $(administrators-group-name) -GROUP_DESCRIPTION 'ADOS setup, Releases setup (until we have it as code), security changes (both ADOS and app related)'
+      ./onprem/create_group.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --projectId $(projectId) --groupName $(administrators-group-name) --groupDescription 'ADOS setup, Releases setup (until we have it as code), security changes (both ADOS and app related)'
     displayName: 'Create $(projectName)-administrators group'
-    env:
-      PROJECT_ID: $(projectId)
 
   - powershell: |
-      ./onprem/create_group.ps1 -ORGANIZATION 'https://ados.demo.kagarlickij.com/DefaultCollection' -PROJECT_ID $Env:PROJECT_ID -GROUP_NAME $(developers-group-name) -GROUP_DESCRIPTION 'develop apps, develop build pipelines, watching Builds and Releases'
+      ./onprem/create_group.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --projectId $(projectId) --groupName $(developers-group-name) --groupDescription 'develop apps, develop build pipelines, watching Builds and Releases'
     displayName: 'Create $(projectName)-developers group'
-    env:
-      PROJECT_ID: $(projectId)
 
   - powershell: |
-      ./onprem/create_group.ps1 -ORGANIZATION 'https://ados.demo.kagarlickij.com/DefaultCollection' -PROJECT_ID $Env:PROJECT_ID -GROUP_NAME $(auditors-group-name) -GROUP_DESCRIPTION 'checking security configs (current vs desired)'
+      ./onprem/create_group.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --projectId $(projectId) --groupName $(auditors-group-name) --groupDescription 'checking security configs (current vs desired)'
     displayName: 'Create $(projectName)-auditors group'
-    env:
-      PROJECT_ID: $(projectId)
 
   - powershell: |
-      ./onprem/create_group.ps1 -ORGANIZATION 'https://ados.demo.kagarlickij.com/DefaultCollection' -PROJECT_ID $Env:PROJECT_ID -GROUP_NAME $(product-owners-group-name) -GROUP_DESCRIPTION 'manage Release activities'
+      ./onprem/create_group.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --projectId $(projectId) --groupName $(product-owners-group-name) --groupDescription 'manage Release activities'
     displayName: 'Create $(projectName)-product-owners group'
-    env:
-      PROJECT_ID: $(projectId)
 
 
   - powershell: |
@@ -109,26 +93,19 @@ jobs:
 
 
   - powershell: |
-      ./onprem/get_groups.ps1 -ORGANIZATION 'https://ados.demo.kagarlickij.com/DefaultCollection' -PROJECT_ID $Env:PROJECT_ID
-    displayName: 'Get list of all groups'
-    env:
-      PROJECT_ID: $(projectId)
-
-
-  - powershell: |
-      python ./onprem/export_group_info.py --groupName $(administrators-group-name) --groupSid $(administrators-group-sid)
+      python ./onprem/export_group_info.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --projectId $(projectId) --groupName $(administrators-group-name) --groupSid $(administrators-group-sid)
     displayName: 'Export $(projectName)-administrators group info'
 
   - powershell: |
-      python ./onprem/export_group_info.py --groupName $(developers-group-name) --groupSid $(developers-group-sid)
+      python ./onprem/export_group_info.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --projectId $(projectId) --groupName $(developers-group-name) --groupSid $(developers-group-sid)
     displayName: 'Export $(projectName)-developers group info'
 
   - powershell: |
-      python ./onprem/export_group_info.py --groupName $(auditors-group-name) --groupSid $(auditors-group-sid)
+      python ./onprem/export_group_info.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --projectId $(projectId) --groupName $(auditors-group-name) --groupSid $(auditors-group-sid)
     displayName: 'Export $(projectName)-auditors group info'
 
   - powershell: |
-      python ./onprem/export_group_info.py --groupName $(product-owners-group-name) --groupSid $(product-owners-group-sid)
+      python ./onprem/export_group_info.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --projectId $(projectId) --groupName $(product-owners-group-name) --groupSid $(product-owners-group-sid)
     displayName: 'Export $(projectName)-product-owners group info'
 
 
