@@ -6,6 +6,7 @@ import json
 import argparse
 import sys
 import os
+import time
 import requests
 
 PARSER = argparse.ArgumentParser()
@@ -40,6 +41,8 @@ else:
     TOKEN = f"{ARGS.projectId}"
 
 SID = os.environ[(ARGS.groupSid).upper()]
+
+time.sleep(1)
 
 URL = "{}/_apis/accesscontrollists/{}?token={}&api-version=5.0".format(
     ARGS.organization, ARGS.namespaceId, TOKEN

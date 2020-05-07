@@ -12,7 +12,7 @@ PARSER = argparse.ArgumentParser()
 
 PARSER.add_argument("--organization", type=str, required=True)
 PARSER.add_argument("--feedId", type=str, required=True)
-PARSER.add_argument("--projectName", type=str, required=True)
+PARSER.add_argument("--projectName", type=str)
 PARSER.add_argument("--groupName", type=str, required=True)
 PARSER.add_argument("--groupSid", type=str, required=True)
 PARSER.add_argument("--role", type=str, required=True)

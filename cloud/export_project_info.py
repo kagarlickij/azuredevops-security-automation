@@ -50,7 +50,6 @@ else:
         print(f"[INFO] projectId = {PROJECT_ID}")
         print(f"##vso[task.setvariable variable=projectId]{PROJECT_ID}")
 
-print("Getting projectScopeDescriptor..")
 URL = "https://vssps.dev.azure.com/{}/_apis/graph/descriptors/{}?api-version=5.0-preview.1".format(
     ARGS.organization, PROJECT_ID
 )

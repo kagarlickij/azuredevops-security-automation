@@ -15,7 +15,7 @@ pr:
 
 variables:
 - name: projectName
-  value: 'templ-test15'
+  value: 'templ-test17'
 
 - group: ados-group-names-templ-test01
 - group: ados-acls-templ-test01
@@ -28,7 +28,6 @@ jobs:
   pool:
     name: Default
   steps:
-
   - powershell: |
       $env:Path += ";C:\Users\Administrator\AppData\Roaming\Python\Python38\Scripts"
       pip install --disable-pip-version-check --ignore-installed --quiet --user --requirement requirements.txt
@@ -41,7 +40,7 @@ jobs:
 
 
   - powershell: sleep 20
-    displayName: 'Wait for APIs to become available..'
+    displayName: 'Wait for Project APIs to become available..'
 
 
   - powershell: |
@@ -50,34 +49,29 @@ jobs:
 
 
   - powershell: |
-      sleep 1
       python ./common/create_tmp_release_pipeline.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --projectName $(projectName) --pat $(onprem_pat)
     displayName: 'Create tmp Release pipeline'
 
 
   - powershell: |
-      sleep 1
       ./onprem/delete_group.ps1 -ORGANIZATION 'https://ados.demo.kagarlickij.com/DefaultCollection' -PROJECT_NAME $(projectName) -GROUP_NAME 'Readers'
     displayName: 'Delete built-in Readers group'
     env:
       PROJECT_SCOPE_DESCRIPTOR: $(projectScopeDescriptor)
 
   - powershell: |
-      sleep 1
       ./onprem/delete_group.ps1 -ORGANIZATION 'https://ados.demo.kagarlickij.com/DefaultCollection' -PROJECT_NAME $(projectName) -GROUP_NAME 'Release Administrators'
     displayName: 'Delete built-in Release Administrators group'
     env:
       PROJECT_SCOPE_DESCRIPTOR: $(projectScopeDescriptor)
 
   - powershell: |
-      sleep 1
       ./onprem/delete_group.ps1 -ORGANIZATION 'https://ados.demo.kagarlickij.com/DefaultCollection' -PROJECT_NAME $(projectName) -GROUP_NAME 'Build Administrators'
     displayName: 'Delete built-in Build Administrators group'
     env:
       PROJECT_SCOPE_DESCRIPTOR: $(projectScopeDescriptor)
 
   - powershell: |
-      sleep 1
       ./onprem/delete_group.ps1 -ORGANIZATION 'https://ados.demo.kagarlickij.com/DefaultCollection' -PROJECT_NAME $(projectName) -GROUP_NAME 'Contributors'
     displayName: 'Delete built-in Contributors group'
     env:
@@ -85,28 +79,24 @@ jobs:
 
 
   - powershell: |
-      sleep 1
       ./onprem/create_group.ps1 -ORGANIZATION 'https://ados.demo.kagarlickij.com/DefaultCollection' -PROJECT_ID $Env:PROJECT_ID -GROUP_NAME $(administrators-group-name) -GROUP_DESCRIPTION 'ADOS setup, Releases setup (until we have it as code), security changes (both ADOS and app related)'
     displayName: 'Create $(projectName)-administrators group'
     env:
       PROJECT_ID: $(projectId)
 
   - powershell: |
-      sleep 1
       ./onprem/create_group.ps1 -ORGANIZATION 'https://ados.demo.kagarlickij.com/DefaultCollection' -PROJECT_ID $Env:PROJECT_ID -GROUP_NAME $(developers-group-name) -GROUP_DESCRIPTION 'develop apps, develop build pipelines, watching Builds and Releases'
     displayName: 'Create $(projectName)-developers group'
     env:
       PROJECT_ID: $(projectId)
 
   - powershell: |
-      sleep 1
       ./onprem/create_group.ps1 -ORGANIZATION 'https://ados.demo.kagarlickij.com/DefaultCollection' -PROJECT_ID $Env:PROJECT_ID -GROUP_NAME $(auditors-group-name) -GROUP_DESCRIPTION 'checking security configs (current vs desired)'
     displayName: 'Create $(projectName)-auditors group'
     env:
       PROJECT_ID: $(projectId)
 
   - powershell: |
-      sleep 1
       ./onprem/create_group.ps1 -ORGANIZATION 'https://ados.demo.kagarlickij.com/DefaultCollection' -PROJECT_ID $Env:PROJECT_ID -GROUP_NAME $(product-owners-group-name) -GROUP_DESCRIPTION 'manage Release activities'
     displayName: 'Create $(projectName)-product-owners group'
     env:
@@ -114,7 +104,11 @@ jobs:
 
 
   - powershell: |
-      sleep 1
+      sleep 10
+    displayName: 'Wait for Groups objects to become available..'
+
+
+  - powershell: |
       ./onprem/get_groups.ps1 -ORGANIZATION 'https://ados.demo.kagarlickij.com/DefaultCollection' -PROJECT_ID $Env:PROJECT_ID
     displayName: 'Get list of all groups'
     env:
@@ -122,49 +116,41 @@ jobs:
 
 
   - powershell: |
-      sleep 1
       python ./onprem/export_group_info.py --groupName $(administrators-group-name) --groupSid $(administrators-group-sid)
     displayName: 'Export $(projectName)-administrators group info'
 
   - powershell: |
-      sleep 1
       python ./onprem/export_group_info.py --groupName $(developers-group-name) --groupSid $(developers-group-sid)
     displayName: 'Export $(projectName)-developers group info'
 
   - powershell: |
-      sleep 1
       python ./onprem/export_group_info.py --groupName $(auditors-group-name) --groupSid $(auditors-group-sid)
     displayName: 'Export $(projectName)-auditors group info'
 
   - powershell: |
-      sleep 1
       python ./onprem/export_group_info.py --groupName $(product-owners-group-name) --groupSid $(product-owners-group-sid)
     displayName: 'Export $(projectName)-product-owners group info'
 
 
   - powershell: |
-      sleep 1
       python ./common/set_permissions.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --projectId $Env:PROJECT_ID --namespaceId '52d39943-cb85-4d7f-8fa8-c6baac873819' --groupName $(administrators-group-name) --groupSid $(administrators-group-sid) --allow $(administrators-project-allow-permissions) --deny $(administrators-project-deny-permissions) --pat $(onprem_pat)
     displayName: 'Set Project permissions for $(projectName)-administrators group'
     env:
       PROJECT_ID: $(projectId)
 
   - powershell: |
-      sleep 1
       python ./common/set_permissions.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --projectId $Env:PROJECT_ID --namespaceId '52d39943-cb85-4d7f-8fa8-c6baac873819' --groupName $(developers-group-name) --groupSid $(developers-group-sid) --allow $(developers-project-allow-permissions) --deny $(developers-project-deny-permissions) --pat $(onprem_pat)
     displayName: 'Set Project permissions for $(projectName)-developers group'
     env:
       PROJECT_ID: $(projectId)
 
   - powershell: |
-      sleep 1
       python ./common/set_permissions.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --projectId $Env:PROJECT_ID --namespaceId '52d39943-cb85-4d7f-8fa8-c6baac873819' --groupName $(auditors-group-name) --groupSid $(auditors-group-sid) --allow $(auditors-project-allow-permissions) --deny $(auditors-project-deny-permissions) --pat $(onprem_pat)
     displayName: 'Set Project permissions for $(projectName)-auditors group'
     env:
       PROJECT_ID: $(projectId)
 
   - powershell: |
-      sleep 1
       python ./common/set_permissions.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --projectId $Env:PROJECT_ID --namespaceId '52d39943-cb85-4d7f-8fa8-c6baac873819' --groupName $(product-owners-group-name) --groupSid $(product-owners-group-sid) --allow $(product-owners-project-allow-permissions) --deny $(product-owners-project-deny-permissions) --pat $(onprem_pat)
     displayName: 'Set Project permissions for $(projectName)-product-owners group'
     env:
@@ -172,28 +158,24 @@ jobs:
 
 
   - powershell: |
-      sleep 1
       python ./common/set_permissions.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --projectId $Env:PROJECT_ID --namespaceId 'd34d3680-dfe5-4cc6-a949-7d9c68f73cba' --groupName $(administrators-group-name) --groupSid $(administrators-group-sid) --allow $(administrators-analytics-allow-permissions) --deny $(administrators-analytics-deny-permissions) --pat $(onprem_pat)
     displayName: 'Set Analytics permissions for $(projectName)-administrators group'
     env:
       PROJECT_ID: $(projectId)
 
   - powershell: |
-      sleep 1
       python ./common/set_permissions.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --projectId $Env:PROJECT_ID --namespaceId 'd34d3680-dfe5-4cc6-a949-7d9c68f73cba' --groupName $(developers-group-name) --groupSid $(developers-group-sid) --allow $(developers-analytics-allow-permissions) --deny $(developers-analytics-deny-permissions) --pat $(onprem_pat)
     displayName: 'Set Analytics permissions for $(projectName)-developers group'
     env:
       PROJECT_ID: $(projectId)
 
   - powershell: |
-      sleep 1
       python ./common/set_permissions.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --projectId $Env:PROJECT_ID --namespaceId 'd34d3680-dfe5-4cc6-a949-7d9c68f73cba' --groupName $(auditors-group-name) --groupSid $(auditors-group-sid) --allow $(auditors-analytics-allow-permissions) --deny $(auditors-analytics-deny-permissions) --pat $(onprem_pat)
     displayName: 'Set Analytics permissions for $(projectName)-auditors group'
     env:
       PROJECT_ID: $(projectId)
 
   - powershell: |
-      sleep 1
       python ./common/set_permissions.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --projectId $Env:PROJECT_ID --namespaceId 'd34d3680-dfe5-4cc6-a949-7d9c68f73cba' --groupName $(product-owners-group-name) --groupSid $(product-owners-group-sid) --allow $(product-owners-analytics-allow-permissions) --deny $(product-owners-analytics-deny-permissions) --pat $(onprem_pat)
     displayName: 'Set Analytics permissions for $(projectName)-product-owners group'
     env:
@@ -201,28 +183,24 @@ jobs:
 
 
   - powershell: |
-      sleep 1
       python ./common/set_permissions.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --projectId $Env:PROJECT_ID --namespaceId 'b7e84409-6553-448a-bbb2-af228e07cbeb' --groupName $(administrators-group-name) --groupSid $(administrators-group-sid) --allow $(administrators-library-allow-permissions) --deny $(administrators-library-deny-permissions) --pat $(onprem_pat)
     displayName: 'Set Library permissions for $(projectName)-administrators group'
     env:
       PROJECT_ID: $(projectId)
 
   - powershell: |
-      sleep 1
       python ./common/set_permissions.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --projectId $Env:PROJECT_ID --namespaceId 'b7e84409-6553-448a-bbb2-af228e07cbeb' --groupName $(developers-group-name) --groupSid $(developers-group-sid) --allow $(developers-library-allow-permissions) --deny $(developers-library-deny-permissions) --pat $(onprem_pat)
     displayName: 'Set Library permissions for $(projectName)-developers group'
     env:
       PROJECT_ID: $(projectId)
 
   - powershell: |
-      sleep 1
       python ./common/set_permissions.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --projectId $Env:PROJECT_ID --namespaceId 'b7e84409-6553-448a-bbb2-af228e07cbeb' --groupName $(auditors-group-name) --groupSid $(auditors-group-sid) --allow $(auditors-library-allow-permissions) --deny $(auditors-library-deny-permissions) --pat $(onprem_pat)
     displayName: 'Set Library permissions for $(projectName)-auditors group'
     env:
       PROJECT_ID: $(projectId)
 
   - powershell: |
-      sleep 1
       python ./common/set_permissions.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --projectId $Env:PROJECT_ID --namespaceId 'b7e84409-6553-448a-bbb2-af228e07cbeb' --groupName $(product-owners-group-name) --groupSid $(product-owners-group-sid) --allow $(product-owners-library-allow-permissions) --deny $(product-owners-library-deny-permissions) --pat $(onprem_pat)
     displayName: 'Set Library permissions for $(projectName)-product-owners group'
     env:
@@ -230,7 +208,6 @@ jobs:
 
 
   - powershell: |
-      sleep 1
       python ./common/set_git_repos.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --projectName $(projectName) --minApproverCount $(minApproverCount) --pat $(onprem_pat)
     displayName: 'Set Git repos settings'
     env:
@@ -238,28 +215,24 @@ jobs:
 
 
   - powershell: |
-      sleep 1
       python ./common/set_permissions.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --projectId $Env:PROJECT_ID --namespaceId '2e9eb7ed-3c0a-47d4-87c1-0ffdd275fd87' --groupName $(administrators-group-name) --groupSid $(administrators-group-sid) --allow $(administrators-git-allow-permissions) --deny $(administrators-git-deny-permissions) --pat $(onprem_pat)
     displayName: 'Set Git permissions for $(projectName)-administrators group'
     env:
       PROJECT_ID: $(projectId)
 
   - powershell: |
-      sleep 1
       python ./common/set_permissions.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --projectId $Env:PROJECT_ID --namespaceId '2e9eb7ed-3c0a-47d4-87c1-0ffdd275fd87' --groupName $(developers-group-name) --groupSid $(developers-group-sid) --allow $(developers-git-allow-permissions) --deny $(developers-git-deny-permissions) --pat $(onprem_pat)
     displayName: 'Set Git permissions for $(projectName)-developers group'
     env:
       PROJECT_ID: $(projectId)
 
   - powershell: |
-      sleep 1
       python ./common/set_permissions.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --projectId $Env:PROJECT_ID --namespaceId '2e9eb7ed-3c0a-47d4-87c1-0ffdd275fd87' --groupName $(auditors-group-name) --groupSid $(auditors-group-sid) --allow $(auditors-git-allow-permissions) --deny $(auditors-git-deny-permissions) --pat $(onprem_pat)
     displayName: 'Set Git permissions for $(projectName)-auditors group'
     env:
       PROJECT_ID: $(projectId)
 
   - powershell: |
-      sleep 1
       python ./common/set_permissions.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --projectId $Env:PROJECT_ID --namespaceId '2e9eb7ed-3c0a-47d4-87c1-0ffdd275fd87' --groupName $(product-owners-group-name) --groupSid $(product-owners-group-sid) --allow $(product-owners-git-allow-permissions) --deny $(product-owners-git-deny-permissions) --pat $(onprem_pat)
     displayName: 'Set Git permissions for $(projectName)-product-owners group'
     env:
@@ -267,28 +240,24 @@ jobs:
 
 
   - powershell: |
-      sleep 1
       python ./common/set_permissions.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --projectId $Env:PROJECT_ID --namespaceId '33344d9c-fc72-4d6f-aba5-fa317101a7e9' --groupName $(administrators-group-name) --groupSid $(administrators-group-sid) --allow $(administrators-build-allow-permissions) --deny $(administrators-build-deny-permissions) --pat $(onprem_pat)
     displayName: 'Set Build permissions for $(projectName)-administrators group'
     env:
       PROJECT_ID: $(projectId)
 
   - powershell: |
-      sleep 1
       python ./common/set_permissions.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --projectId $Env:PROJECT_ID --namespaceId '33344d9c-fc72-4d6f-aba5-fa317101a7e9' --groupName $(developers-group-name) --groupSid $(developers-group-sid) --allow $(developers-build-allow-permissions) --deny $(developers-build-deny-permissions) --pat $(onprem_pat)
     displayName: 'Set Build permissions for $(projectName)-developers group'
     env:
       PROJECT_ID: $(projectId)
 
   - powershell: |
-      sleep 1
       python ./common/set_permissions.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --projectId $Env:PROJECT_ID --namespaceId '33344d9c-fc72-4d6f-aba5-fa317101a7e9' --groupName $(auditors-group-name) --groupSid $(auditors-group-sid) --allow $(auditors-build-allow-permissions) --deny $(auditors-build-deny-permissions) --pat $(onprem_pat)
     displayName: 'Set Build permissions for $(projectName)-auditors group'
     env:
       PROJECT_ID: $(projectId)
 
   - powershell: |
-      sleep 1
       python ./common/set_permissions.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --projectId $Env:PROJECT_ID --namespaceId '33344d9c-fc72-4d6f-aba5-fa317101a7e9' --groupName $(product-owners-group-name) --groupSid $(product-owners-group-sid) --allow $(product-owners-build-allow-permissions) --deny $(product-owners-build-deny-permissions) --pat $(onprem_pat)
     displayName: 'Set Build permissions for $(projectName)-product-owners group'
     env:
@@ -296,28 +265,24 @@ jobs:
 
 
   - powershell: |
-      sleep 1
       python ./common/set_permissions.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --projectId $Env:PROJECT_ID --namespaceId 'c788c23e-1b46-4162-8f5e-d7585343b5de' --groupName $(administrators-group-name) --groupSid $(administrators-group-sid) --allow $(administrators-release-allow-permissions) --deny $(administrators-release-deny-permissions) --pat $(onprem_pat)
     displayName: 'Set Release permissions for $(projectName)-administrators group'
     env:
       PROJECT_ID: $(projectId)
 
   - powershell: |
-      sleep 1
       python ./common/set_permissions.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --projectId $Env:PROJECT_ID --namespaceId 'c788c23e-1b46-4162-8f5e-d7585343b5de' --groupName $(developers-group-name) --groupSid $(developers-group-sid) --allow $(developers-release-allow-permissions) --deny $(developers-release-deny-permissions) --pat $(onprem_pat)
     displayName: 'Set Release permissions for $(projectName)-developers group'
     env:
       PROJECT_ID: $(projectId)
 
   - powershell: |
-      sleep 1
       python ./common/set_permissions.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --projectId $Env:PROJECT_ID --namespaceId 'c788c23e-1b46-4162-8f5e-d7585343b5de' --groupName $(auditors-group-name) --groupSid $(auditors-group-sid) --allow $(auditors-release-allow-permissions) --deny $(auditors-release-deny-permissions) --pat $(onprem_pat)
     displayName: 'Set Release permissions for $(projectName)-auditors group'
     env:
       PROJECT_ID: $(projectId)
 
   - powershell: |
-      sleep 1
       python ./common/set_permissions.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --projectId $Env:PROJECT_ID --namespaceId 'c788c23e-1b46-4162-8f5e-d7585343b5de' --groupName $(product-owners-group-name) --groupSid $(product-owners-group-sid) --allow $(product-owners-release-allow-permissions) --deny $(product-owners-release-deny-permissions) --pat $(onprem_pat)
     displayName: 'Set Release permissions for $(projectName)-product-owners group'
     env:
@@ -325,20 +290,18 @@ jobs:
 
 
   - powershell: |
-      sleep 1
       python ./common/delete_tmp_release_pipeline.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --projectName $(projectName) --pat $(onprem_pat)
     displayName: 'Delete tmp Release pipeline'
 
 
   - powershell: |
-      sleep 1
       python ./common/create_feed.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --feedName $(projectName) --pat $(onprem_pat)
     displayName: 'Create Artifact feed'
 
 
   - powershell: |
       sleep 10
-    displayName: 'Wait for APIs to become available..'
+    displayName: 'Wait for Feed APIs to become available..'
 
 
   - powershell: |
@@ -347,28 +310,24 @@ jobs:
 
 
   - powershell: |
-      sleep 1
       python ./common/set_feed_acl.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --groupName $(administrators-group-name) --groupSid $(administrators-group-sid) --feedId $Env:FEED_ID --role $(administrators-feed-permissions) --pat $(onprem_pat)
     displayName: 'Set Feed permissions for $(projectName)-administrators group'
     env:
       FEED_ID: $(feedId)
 
   - powershell: |
-      sleep 1
       python ./common/set_feed_acl.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --groupName $(developers-group-name) --groupSid $(developers-group-sid) --feedId $Env:FEED_ID --role $(developers-feed-permissions) --pat $(onprem_pat)
     displayName: 'Set Feed permissions for $(projectName)-developers group'
     env:
       FEED_ID: $(feedId)
 
   - powershell: |
-      sleep 1
       python ./common/set_feed_acl.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --groupName $(auditors-group-name) --groupSid $(auditors-group-sid) --feedId $Env:FEED_ID --role $(auditors-feed-permissions) --pat $(onprem_pat)
     displayName: 'Set Feed permissions for $(projectName)-auditors group'
     env:
       FEED_ID: $(feedId)
 
   - powershell: |
-      sleep 1
       python ./common/set_feed_acl.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --groupName $(product-owners-group-name) --groupSid $(product-owners-group-sid) --feedId $Env:FEED_ID --role $(product-owners-feed-permissions) --pat $(onprem_pat)
     displayName: 'Set Feed permissions for $(projectName)-product-owners group'
     env:
