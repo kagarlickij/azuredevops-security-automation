@@ -47,11 +47,10 @@ jobs:
       pip install --disable-pip-version-check --ignore-installed --quiet --requirement requirements.txt
     displayName: 'Install Python requirements'
   - bash: |
-      pip install --disable-pip-version-check --ignore-installed --quiet --version pylint-fail-under==0.3.0
-      pip install --disable-pip-version-check --ignore-installed --quiet --version pylint==2.5.0 #Latest pylint has an issue - https://github.com/TNThieding/pylint-fail-under/issues/8
+      pip install --disable-pip-version-check --ignore-installed --quiet --version pylint==2.5.0
     displayName: 'Install Python linter'
   - bash: |
-      pylint-fail-under --fail_under 8.00 ./**/*.py
+      pylint ./**/*.py --fail-under 8
     displayName: 'Run Python linter'
 
 - job: build
@@ -68,7 +67,7 @@ jobs:
     displayName: 'Install Python requirements'
   - bash: |
       pip install --disable-pip-version-check --ignore-installed --quiet --version pylint==2.5.0
-      pip install --disable-pip-version-check --ignore-installed --quiet anybadge
+      pip install --disable-pip-version-check --ignore-installed --quiet anybadge==1.7.0
     displayName: 'Install pylint and anybadge'
   - task: PythonScript@0
     displayName: 'Generate pylint badge'
