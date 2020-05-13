@@ -15,12 +15,7 @@
       entry: bandit
       args:
         - '--recursive'
-        - '--exclude'
-        - "./generate_pylint_badge.py"
-        - '--skip'
-        - 'B602,B404'
-        - '--level'
-        - 'HIGH'
+        - '-ll'
         - .
       language: system
       types:

@@ -22,7 +22,7 @@ CMD = [
 ]
 
 LIST_GROUPS_OUTPUT = subprocess.run(
-    CMD, check=True, stdout=subprocess.PIPE, shell=True
+    CMD, check=True, stdout=subprocess.PIPE
 ).stdout.decode("utf-8")
 
 CURRENT_GROUPS_LIST = list()

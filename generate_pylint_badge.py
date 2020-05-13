@@ -17,7 +17,7 @@ PARSER.add_argument("--gitHubPat", type=str, required=True)
 ARGS = PARSER.parse_args()
 
 PYLINT_OUTPUT = subprocess.run(
-    "pylint --exit-zero ./**/*.py", check=True, stdout=subprocess.PIPE, shell=True
+    "pylint --exit-zero ./**/*.py", check=True, stdout=subprocess.PIPE
 ).stdout.decode("utf-8")
 PYLINT_SCORE = PYLINT_OUTPUT.split("at ", 1)[1].split("/", 1)[0]
 print(f"[INFO] PYLINT_SCORE: {PYLINT_SCORE}")
@@ -26,7 +26,6 @@ subprocess.run(
     f"anybadge --overwrite --label pylint --value {PYLINT_SCORE} --file pylint.svg 2=red 4=orange 8=yellow 10=green",
     check=True,
     stdout=subprocess.PIPE,
-    shell=True,
 ).stdout.decode("utf-8")
 
 SVG = open("pylint.svg", "r")

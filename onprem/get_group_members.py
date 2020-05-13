@@ -23,7 +23,7 @@ CMD = [
 ]
 
 CURRENT_MEMBERS_OUTPUT = subprocess.run(
-    CMD, check=True, stdout=subprocess.PIPE, shell=True
+    CMD, check=True, stdout=subprocess.PIPE
 ).stdout.decode("utf-8")
 
 CURRENT_MEMBERS_LINE = ""

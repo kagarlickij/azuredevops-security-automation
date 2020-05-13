@@ -20,8 +20,8 @@ CMD = [
     f"/collection:{ARGS.organization}",
 ]
 
-DELETE_OUTPUT = subprocess.run(
-    CMD, check=True, stdout=subprocess.PIPE, shell=True
-).stdout.decode("utf-8")
+DELETE_OUTPUT = subprocess.run(CMD, check=True, stdout=subprocess.PIPE).stdout.decode(
+    "utf-8"
+)
 
 print(f"[DEBUG] DELETE_OUTPUT: {DELETE_OUTPUT}")

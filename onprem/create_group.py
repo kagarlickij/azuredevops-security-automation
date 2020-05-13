@@ -23,8 +23,8 @@ CMD = [
     f"/collection:{ARGS.organization}",
 ]
 
-CREATE_OUTPUT = subprocess.run(
-    CMD, check=True, stdout=subprocess.PIPE, shell=True
-).stdout.decode("utf-8")
+CREATE_OUTPUT = subprocess.run(CMD, check=True, stdout=subprocess.PIPE).stdout.decode(
+    "utf-8"
+)
 
 print(f"[DEBUG] CREATE_OUTPUT: {CREATE_OUTPUT}")
