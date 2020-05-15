@@ -15,7 +15,7 @@ pr:
 
 variables:
 - name: projectName
-  value: 'templ-test21'
+  value: 'templ-test25'
 
 - group: ados-group-names-templ-test01
 - group: ados-acls-templ-test01
@@ -185,7 +185,7 @@ jobs:
 
 
   - powershell: |
-      python ./common/set_git_repos.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --projectName $(projectName) --minApproverCount $(minApproverCount) --pat $(onprem_pat)
+      python ./common/set_git_policy.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --projectName $(projectName) --minApproverCount $(minApproverCount) --pat $(onprem_pat)
     displayName: 'Set Git repos settings'
     env:
       PROJECT_ID: $(projectId)
@@ -287,25 +287,25 @@ jobs:
 
 
   - powershell: |
-      python ./common/set_feed_acl.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --groupName $(administrators-group-name) --groupSid $(administrators-group-sid) --feedId $Env:FEED_ID --role $(administrators-feed-permissions) --pat $(onprem_pat)
+      python ./common/set_feed_permissions.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --groupName $(administrators-group-name) --groupSid $(administrators-group-sid) --feedId $Env:FEED_ID --role $(administrators-feed-permissions) --pat $(onprem_pat)
     displayName: 'Set Feed permissions for $(projectName)-administrators group'
     env:
       FEED_ID: $(feedId)
 
   - powershell: |
-      python ./common/set_feed_acl.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --groupName $(developers-group-name) --groupSid $(developers-group-sid) --feedId $Env:FEED_ID --role $(developers-feed-permissions) --pat $(onprem_pat)
+      python ./common/set_feed_permissions.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --groupName $(developers-group-name) --groupSid $(developers-group-sid) --feedId $Env:FEED_ID --role $(developers-feed-permissions) --pat $(onprem_pat)
     displayName: 'Set Feed permissions for $(projectName)-developers group'
     env:
       FEED_ID: $(feedId)
 
   - powershell: |
-      python ./common/set_feed_acl.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --groupName $(auditors-group-name) --groupSid $(auditors-group-sid) --feedId $Env:FEED_ID --role $(auditors-feed-permissions) --pat $(onprem_pat)
+      python ./common/set_feed_permissions.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --groupName $(auditors-group-name) --groupSid $(auditors-group-sid) --feedId $Env:FEED_ID --role $(auditors-feed-permissions) --pat $(onprem_pat)
     displayName: 'Set Feed permissions for $(projectName)-auditors group'
     env:
       FEED_ID: $(feedId)
 
   - powershell: |
-      python ./common/set_feed_acl.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --groupName $(product-owners-group-name) --groupSid $(product-owners-group-sid) --feedId $Env:FEED_ID --role $(product-owners-feed-permissions) --pat $(onprem_pat)
+      python ./common/set_feed_permissions.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --groupName $(product-owners-group-name) --groupSid $(product-owners-group-sid) --feedId $Env:FEED_ID --role $(product-owners-feed-permissions) --pat $(onprem_pat)
     displayName: 'Set Feed permissions for $(projectName)-product-owners group'
     env:
       FEED_ID: $(feedId)

@@ -15,7 +15,7 @@ pr:
 
 variables:
 - name: projectName
-  value: 'templ-test43'
+  value: 'templ-test45'
 
 - group: ados-group-names-templ-test01
 - group: ados-acls-templ-test01
@@ -221,7 +221,7 @@ jobs:
 
   - task: PythonScript@0
     inputs:
-      scriptPath: ./common/set_git_repos.py
+      scriptPath: ./common/set_git_policy.py
       arguments: '--organization https://dev.azure.com/kagarlickij --projectName $(projectName) --minApproverCount $(minApproverCount) --pat $(cloud_pat)'
     displayName: 'Set Git repos settings'
 
@@ -329,24 +329,24 @@ jobs:
 
   - task: PythonScript@0
     inputs:
-      scriptPath: ./common/set_feed_acl.py
+      scriptPath: ./common/set_feed_permissions.py
       arguments: '--organization https://feeds.dev.azure.com/kagarlickij --projectName $(projectName) --groupName $(administrators-group-name) --groupSid $(administrators-group-sid) --feedId $(feedId) --role $(administrators-feed-permissions) --pat $(cloud_pat)'
     displayName: 'Set Feed permissions for $(projectName)-administrators group'
 
   - task: PythonScript@0
     inputs:
-      scriptPath: ./common/set_feed_acl.py
+      scriptPath: ./common/set_feed_permissions.py
       arguments: '--organization https://feeds.dev.azure.com/kagarlickij --projectName $(projectName) --groupName $(developers-group-name) --groupSid $(developers-group-sid) --feedId $(feedId) --role $(developers-feed-permissions) --pat $(cloud_pat)'
     displayName: 'Set Feed permissions for $(projectName)-developers group'
 
   - task: PythonScript@0
     inputs:
-      scriptPath: ./common/set_feed_acl.py
+      scriptPath: ./common/set_feed_permissions.py
       arguments: '--organization https://feeds.dev.azure.com/kagarlickij --projectName $(projectName) --groupName $(auditors-group-name) --groupSid $(auditors-group-sid) --feedId $(feedId) --role $(auditors-feed-permissions) --pat $(cloud_pat)'
     displayName: 'Set Feed permissions for $(projectName)-auditors group'
 
   - task: PythonScript@0
     inputs:
-      scriptPath: ./common/set_feed_acl.py
+      scriptPath: ./common/set_feed_permissions.py
       arguments: '--organization https://feeds.dev.azure.com/kagarlickij --projectName $(projectName) --groupName $(product-owners-group-name) --groupSid $(product-owners-group-sid) --feedId $(feedId) --role $(product-owners-feed-permissions) --pat $(cloud_pat)'
     displayName: 'Set Feed permissions for $(projectName)-product-owners group'

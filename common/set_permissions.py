@@ -34,7 +34,7 @@ elif ARGS.namespaceId == "d34d3680-dfe5-4cc6-a949-7d9c68f73cba":
     print("[INFO] Analytics namespace, adding `$/Shared` to token..")
     TOKEN = f"$/Shared/{ARGS.projectId}"
 elif ARGS.namespaceId == "b7e84409-6553-448a-bbb2-af228e07cbeb":
-    print("[INFO] Variable group namespace, adding `Library/` to token..")
+    print("[INFO] Library namespace, adding `Library/` to token..")
     TOKEN = f"Library/{ARGS.projectId}"
 else:
     print("[INFO] standart format for token")

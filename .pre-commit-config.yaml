@@ -15,8 +15,10 @@
       entry: bandit
       args:
         - '--recursive'
+        - '--exclude'
+        - 'generate_pylint_badge.py'
         - '-ll'
-        - .
+        - '.'
       language: system
       types:
         - python
