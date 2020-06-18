@@ -1,0 +1,43 @@
+steps:
+- task: PythonScript@0
+  inputs:
+    scriptPath: ./common/create_feed.py
+    arguments: '--organization https://feeds.dev.azure.com/kagarlickij --projectName $(projectName) --feedName $(projectName) --pat $(cloud_pat)'
+  displayName: 'Create Artifact feed'
+
+
+- bash: |
+    sleep 10
+  displayName: 'Wait for Feed APIs to become available..'
+
+
+- task: PythonScript@0
+  inputs:
+    scriptPath: ./common/export_feed_info.py
+    arguments: '--organization https://feeds.dev.azure.com/kagarlickij --feedName $(projectName) --pat $(cloud_pat)'
+  displayName: 'Export feed-related info'
+
+
+- task: PythonScript@0
+  inputs:
+    scriptPath: ./common/set_feed_permissions.py
+    arguments: '--organization https://feeds.dev.azure.com/kagarlickij --projectName $(projectName) --groupName $(administrators-group-name) --groupSid $(administrators-group-sid) --feedId $(feedId) --role $(administrators-feed-permissions) --pat $(cloud_pat)'
+  displayName: 'Set Feed permissions for $(projectName)-administrators group'
+
+- task: PythonScript@0
+  inputs:
+    scriptPath: ./common/set_feed_permissions.py
+    arguments: '--organization https://feeds.dev.azure.com/kagarlickij --projectName $(projectName) --groupName $(developers-group-name) --groupSid $(developers-group-sid) --feedId $(feedId) --role $(developers-feed-permissions) --pat $(cloud_pat)'
+  displayName: 'Set Feed permissions for $(projectName)-developers group'
+
+- task: PythonScript@0
+  inputs:
+    scriptPath: ./common/set_feed_permissions.py
+    arguments: '--organization https://feeds.dev.azure.com/kagarlickij --projectName $(projectName) --groupName $(auditors-group-name) --groupSid $(auditors-group-sid) --feedId $(feedId) --role $(auditors-feed-permissions) --pat $(cloud_pat)'
+  displayName: 'Set Feed permissions for $(projectName)-auditors group'
+
+- task: PythonScript@0
+  inputs:
+    scriptPath: ./common/set_feed_permissions.py
+    arguments: '--organization https://feeds.dev.azure.com/kagarlickij --projectName $(projectName) --groupName $(product-owners-group-name) --groupSid $(product-owners-group-sid) --feedId $(feedId) --role $(product-owners-feed-permissions) --pat $(cloud_pat)'
+  displayName: 'Set Feed permissions for $(projectName)-product-owners group'

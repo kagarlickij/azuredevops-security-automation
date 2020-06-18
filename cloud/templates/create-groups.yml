@@ -1,0 +1,24 @@
+steps:
+- task: PythonScript@0
+  inputs:
+    scriptPath: ./cloud/create_group.py
+    arguments: '--organization https://vssps.dev.azure.com/kagarlickij --projectScopeDescriptor $(projectScopeDescriptor) --groupName $(administrators-group-name) --groupDescription "ADOS setup, Releases setup (until we have it as code), security changes (both ADOS and app related)" --pat $(cloud_pat)'
+  displayName: 'Create $(projectName)-administrators group'
+
+- task: PythonScript@0
+  inputs:
+    scriptPath: ./cloud/create_group.py
+    arguments: '--organization https://vssps.dev.azure.com/kagarlickij --projectScopeDescriptor $(projectScopeDescriptor) --groupName $(developers-group-name) --groupDescription "develop apps, develop build pipelines, watching Builds and Releases" --pat $(cloud_pat)'
+  displayName: 'Create $(projectName)-developers group'
+
+- task: PythonScript@0
+  inputs:
+    scriptPath: ./cloud/create_group.py
+    arguments: '--organization https://vssps.dev.azure.com/kagarlickij --projectScopeDescriptor $(projectScopeDescriptor) --groupName $(auditors-group-name) --groupDescription "checking security configs (current vs desired)" --pat $(cloud_pat)'
+  displayName: 'Create $(projectName)-auditors group'
+
+- task: PythonScript@0
+  inputs:
+    scriptPath: ./cloud/create_group.py
+    arguments: '--organization https://vssps.dev.azure.com/kagarlickij --projectScopeDescriptor $(projectScopeDescriptor) --groupName $(product-owners-group-name) --groupDescription "manage Release activities" --pat $(cloud_pat)'
+  displayName: 'Create $(projectName)-product-owners group'

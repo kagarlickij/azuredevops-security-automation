@@ -1,0 +1,24 @@
+steps:
+- powershell: |
+    python ./common/set_permissions.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --projectId $Env:PROJECT_ID --namespaceId '33344d9c-fc72-4d6f-aba5-fa317101a7e9' --groupName $(administrators-group-name) --groupSid $(administrators-group-sid) --allow $(administrators-build-allow-permissions) --deny $(administrators-build-deny-permissions) --pat $(onprem_pat)
+  displayName: 'Set Build permissions for $(projectName)-administrators group'
+  env:
+    PROJECT_ID: $(projectId)
+
+- powershell: |
+    python ./common/set_permissions.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --projectId $Env:PROJECT_ID --namespaceId '33344d9c-fc72-4d6f-aba5-fa317101a7e9' --groupName $(developers-group-name) --groupSid $(developers-group-sid) --allow $(developers-build-allow-permissions) --deny $(developers-build-deny-permissions) --pat $(onprem_pat)
+  displayName: 'Set Build permissions for $(projectName)-developers group'
+  env:
+    PROJECT_ID: $(projectId)
+
+- powershell: |
+    python ./common/set_permissions.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --projectId $Env:PROJECT_ID --namespaceId '33344d9c-fc72-4d6f-aba5-fa317101a7e9' --groupName $(auditors-group-name) --groupSid $(auditors-group-sid) --allow $(auditors-build-allow-permissions) --deny $(auditors-build-deny-permissions) --pat $(onprem_pat)
+  displayName: 'Set Build permissions for $(projectName)-auditors group'
+  env:
+    PROJECT_ID: $(projectId)
+
+- powershell: |
+    python ./common/set_permissions.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --projectId $Env:PROJECT_ID --namespaceId '33344d9c-fc72-4d6f-aba5-fa317101a7e9' --groupName $(product-owners-group-name) --groupSid $(product-owners-group-sid) --allow $(product-owners-build-allow-permissions) --deny $(product-owners-build-deny-permissions) --pat $(onprem_pat)
+  displayName: 'Set Build permissions for $(projectName)-product-owners group'
+  env:
+    PROJECT_ID: $(projectId)

@@ -1,0 +1,24 @@
+steps:
+- powershell: |
+    python ./common/set_permissions.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --projectId $Env:PROJECT_ID --namespaceId 'c788c23e-1b46-4162-8f5e-d7585343b5de' --groupName $(administrators-group-name) --groupSid $(administrators-group-sid) --allow $(administrators-release-allow-permissions) --deny $(administrators-release-deny-permissions) --pat $(onprem_pat)
+  displayName: 'Set Release permissions for $(projectName)-administrators group'
+  env:
+    PROJECT_ID: $(projectId)
+
+- powershell: |
+    python ./common/set_permissions.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --projectId $Env:PROJECT_ID --namespaceId 'c788c23e-1b46-4162-8f5e-d7585343b5de' --groupName $(developers-group-name) --groupSid $(developers-group-sid) --allow $(developers-release-allow-permissions) --deny $(developers-release-deny-permissions) --pat $(onprem_pat)
+  displayName: 'Set Release permissions for $(projectName)-developers group'
+  env:
+    PROJECT_ID: $(projectId)
+
+- powershell: |
+    python ./common/set_permissions.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --projectId $Env:PROJECT_ID --namespaceId 'c788c23e-1b46-4162-8f5e-d7585343b5de' --groupName $(auditors-group-name) --groupSid $(auditors-group-sid) --allow $(auditors-release-allow-permissions) --deny $(auditors-release-deny-permissions) --pat $(onprem_pat)
+  displayName: 'Set Release permissions for $(projectName)-auditors group'
+  env:
+    PROJECT_ID: $(projectId)
+
+- powershell: |
+    python ./common/set_permissions.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --projectId $Env:PROJECT_ID --namespaceId 'c788c23e-1b46-4162-8f5e-d7585343b5de' --groupName $(product-owners-group-name) --groupSid $(product-owners-group-sid) --allow $(product-owners-release-allow-permissions) --deny $(product-owners-release-deny-permissions) --pat $(onprem_pat)
+  displayName: 'Set Release permissions for $(projectName)-product-owners group'
+  env:
+    PROJECT_ID: $(projectId)

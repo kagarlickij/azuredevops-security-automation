@@ -1,0 +1,24 @@
+steps:
+- task: PythonScript@0
+  inputs:
+    scriptPath: ./common/set_permissions.py
+    arguments: '--organization https://dev.azure.com/kagarlickij --projectId $(projectId) --namespaceId d34d3680-dfe5-4cc6-a949-7d9c68f73cba --groupName $(administrators-group-name) --groupSid $(administrators-group-sid) --allow $(administrators-analytics-allow-permissions) --deny $(administrators-analytics-deny-permissions) --pat $(cloud_pat)'
+  displayName: 'Set Analytics permissions for $(projectName)-administrators group'
+
+- task: PythonScript@0
+  inputs:
+    scriptPath: ./common/set_permissions.py
+    arguments: '--organization https://dev.azure.com/kagarlickij --projectId $(projectId) --namespaceId d34d3680-dfe5-4cc6-a949-7d9c68f73cba --groupName $(developers-group-name) --groupSid $(developers-group-sid) --allow $(developers-analytics-allow-permissions) --deny $(developers-analytics-deny-permissions) --pat $(cloud_pat)'
+  displayName: 'Set Analytics permissions for $(projectName)-developers group'
+
+- task: PythonScript@0
+  inputs:
+    scriptPath: ./common/set_permissions.py
+    arguments: '--organization https://dev.azure.com/kagarlickij --projectId $(projectId) --namespaceId d34d3680-dfe5-4cc6-a949-7d9c68f73cba --groupName $(auditors-group-name) --groupSid $(auditors-group-sid) --allow $(auditors-analytics-allow-permissions) --deny $(auditors-analytics-deny-permissions) --pat $(cloud_pat)'
+  displayName: 'Set Analytics permissions for $(projectName)-auditors group'
+
+- task: PythonScript@0
+  inputs:
+    scriptPath: ./common/set_permissions.py
+    arguments: '--organization https://dev.azure.com/kagarlickij --projectId $(projectId) --namespaceId d34d3680-dfe5-4cc6-a949-7d9c68f73cba --groupName $(product-owners-group-name) --groupSid $(product-owners-group-sid) --allow $(product-owners-analytics-allow-permissions) --deny $(product-owners-analytics-deny-permissions) --pat $(cloud_pat)'
+  displayName: 'Set Analytics permissions for $(projectName)-product-owners group'

@@ -1,0 +1,16 @@
+steps:
+- powershell: |
+    ./onprem/delete_group.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --projectName $(projectName) --groupName 'Readers'
+  displayName: 'Delete built-in Readers group'
+
+- powershell: |
+    ./onprem/delete_group.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --projectName $(projectName) --groupName 'Release Administrators'
+  displayName: 'Delete built-in Release Administrators group'
+
+- powershell: |
+    ./onprem/delete_group.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --projectName $(projectName) --groupName 'Build Administrators'
+  displayName: 'Delete built-in Build Administrators group'
+
+- powershell: |
+    ./onprem/delete_group.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --projectName $(projectName) --groupName 'Contributors'
+  displayName: 'Delete built-in Contributors group'

@@ -1,0 +1,28 @@
+steps:
+- powershell: |
+    python ./common/check_feed_permissions.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --groupName $(administrators-group-name) --groupSid $(administrators-group-sid) --feedId $Env:FEED_ID --role $(administrators-feed-permissions) --pat $(onprem_pat)
+  displayName: 'Check Feed permissions for $(projectName)-administrators group'
+  continueOnError: true
+  env:
+    FEED_ID: $(feedId)
+
+- powershell: |
+    python ./common/check_feed_permissions.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --groupName $(developers-group-name) --groupSid $(developers-group-sid) --feedId $Env:FEED_ID --role $(developers-feed-permissions) --pat $(onprem_pat)
+  displayName: 'Check Feed permissions for $(projectName)-developers group'
+  continueOnError: true
+  env:
+    FEED_ID: $(feedId)
+
+- powershell: |
+    python ./common/check_feed_permissions.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --groupName $(auditors-group-name) --groupSid $(auditors-group-sid) --feedId $Env:FEED_ID --role $(auditors-feed-permissions) --pat $(onprem_pat)
+  displayName: 'Check Feed permissions for $(projectName)-auditors group'
+  continueOnError: true
+  env:
+    FEED_ID: $(feedId)
+
+- powershell: |
+    python ./common/check_feed_permissions.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --groupName $(product-owners-group-name) --groupSid $(product-owners-group-sid) --feedId $Env:FEED_ID --role $(product-owners-feed-permissions) --pat $(onprem_pat)
+  displayName: 'Check Feed permissions for $(projectName)-product-owners group'
+  continueOnError: true
+  env:
+    FEED_ID: $(feedId)

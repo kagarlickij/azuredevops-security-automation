@@ -1,0 +1,39 @@
+steps:
+- powershell: |
+    python ./common/create_feed.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --feedName $(projectName) --pat $(onprem_pat)
+  displayName: 'Create Artifact feed'
+
+
+- powershell: |
+    sleep 10
+  displayName: 'Wait for Feed APIs to become available..'
+
+
+- powershell: |
+    python ./common/export_feed_info.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --feedName $(projectName) --pat $(onprem_pat)
+  displayName: 'Export feed-related info'
+
+
+- powershell: |
+    python ./common/set_feed_permissions.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --groupName $(administrators-group-name) --groupSid $(administrators-group-sid) --feedId $Env:FEED_ID --role $(administrators-feed-permissions) --pat $(onprem_pat)
+  displayName: 'Set Feed permissions for $(projectName)-administrators group'
+  env:
+    FEED_ID: $(feedId)
+
+- powershell: |
+    python ./common/set_feed_permissions.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --groupName $(developers-group-name) --groupSid $(developers-group-sid) --feedId $Env:FEED_ID --role $(developers-feed-permissions) --pat $(onprem_pat)
+  displayName: 'Set Feed permissions for $(projectName)-developers group'
+  env:
+    FEED_ID: $(feedId)
+
+- powershell: |
+    python ./common/set_feed_permissions.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --groupName $(auditors-group-name) --groupSid $(auditors-group-sid) --feedId $Env:FEED_ID --role $(auditors-feed-permissions) --pat $(onprem_pat)
+  displayName: 'Set Feed permissions for $(projectName)-auditors group'
+  env:
+    FEED_ID: $(feedId)
+
+- powershell: |
+    python ./common/set_feed_permissions.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --groupName $(product-owners-group-name) --groupSid $(product-owners-group-sid) --feedId $Env:FEED_ID --role $(product-owners-feed-permissions) --pat $(onprem_pat)
+  displayName: 'Set Feed permissions for $(projectName)-product-owners group'
+  env:
+    FEED_ID: $(feedId)

@@ -1,0 +1,24 @@
+steps:
+- task: PythonScript@0
+  inputs:
+    scriptPath: ./cloud/delete_group.py
+    arguments: '--organization https://vssps.dev.azure.com/kagarlickij --projectScopeDescriptor $(projectScopeDescriptor) --groupName "Readers" --pat $(cloud_pat)'
+  displayName: 'Delete built-in Readers group'
+
+- task: PythonScript@0
+  inputs:
+    scriptPath: ./cloud/delete_group.py
+    arguments: '--organization https://vssps.dev.azure.com/kagarlickij --projectScopeDescriptor $(projectScopeDescriptor) --groupName "Release Administrators" --pat $(cloud_pat)'
+  displayName: 'Delete built-in Release Administrators group'
+
+- task: PythonScript@0
+  inputs:
+    scriptPath: ./cloud/delete_group.py
+    arguments: '--organization https://vssps.dev.azure.com/kagarlickij --projectScopeDescriptor $(projectScopeDescriptor) --groupName "Build Administrators" --pat $(cloud_pat)'
+  displayName: 'Delete built-in Build Administrators group'
+
+- task: PythonScript@0
+  inputs:
+    scriptPath: ./cloud/delete_group.py
+    arguments: '--organization https://vssps.dev.azure.com/kagarlickij --projectScopeDescriptor $(projectScopeDescriptor) --groupName "Contributors" --pat $(cloud_pat)'
+  displayName: 'Delete built-in Contributors group'

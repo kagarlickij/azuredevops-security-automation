@@ -1,0 +1,28 @@
+steps:
+- powershell: |
+    python ./common/check_permissions.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --projectId $Env:PROJECT_ID --namespaceId '52d39943-cb85-4d7f-8fa8-c6baac873819' --groupName $(administrators-group-name) --groupSid $(administrators-group-sid) --allow $(administrators-project-allow-permissions) --deny $(administrators-project-deny-permissions) --pat $(onprem_pat)
+  displayName: 'Check Project permissions for $(projectName)-administrators group'
+  continueOnError: true
+  env:
+    PROJECT_ID: $(projectId)
+
+- powershell: |
+    python ./common/check_permissions.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --projectId $Env:PROJECT_ID --namespaceId '52d39943-cb85-4d7f-8fa8-c6baac873819' --groupName $(developers-group-name) --groupSid $(developers-group-sid) --allow $(developers-project-allow-permissions) --deny $(developers-project-deny-permissions) --pat $(onprem_pat)
+  displayName: 'Check Project permissions for $(projectName)-developers group'
+  continueOnError: true
+  env:
+    PROJECT_ID: $(projectId)
+
+- powershell: |
+    python ./common/check_permissions.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --projectId $Env:PROJECT_ID --namespaceId '52d39943-cb85-4d7f-8fa8-c6baac873819' --groupName $(auditors-group-name) --groupSid $(auditors-group-sid) --allow $(auditors-project-allow-permissions) --deny $(auditors-project-deny-permissions) --pat $(onprem_pat)
+  displayName: 'Check Project permissions for $(projectName)-auditors group'
+  continueOnError: true
+  env:
+    PROJECT_ID: $(projectId)
+
+- powershell: |
+    python ./common/check_permissions.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --projectId $Env:PROJECT_ID --namespaceId '52d39943-cb85-4d7f-8fa8-c6baac873819' --groupName $(product-owners-group-name) --groupSid $(product-owners-group-sid) --allow $(product-owners-project-allow-permissions) --deny $(product-owners-project-deny-permissions) --pat $(onprem_pat)
+  displayName: 'Check Project permissions for $(projectName)-product-owners group'
+  continueOnError: true
+  env:
+    PROJECT_ID: $(projectId)

@@ -1,0 +1,34 @@
+steps:
+- powershell: |
+    python ./common/check_git_policy.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --projectName $(projectName) --maxCommitAge $(maxCommitAge) --maxPullRequestAge $(maxPullRequestAge) --minApproverCount $(minApproverCount) --pat $(onprem_pat)
+  displayName: 'Check Git repos settings'
+  continueOnError: true
+
+
+- powershell: |
+    python ./common/check_permissions.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --projectId $Env:PROJECT_ID --namespaceId '2e9eb7ed-3c0a-47d4-87c1-0ffdd275fd87' --groupName $(administrators-group-name) --groupSid $(administrators-group-sid) --allow $(administrators-git-allow-permissions) --deny $(administrators-git-deny-permissions) --pat $(onprem_pat)
+  displayName: 'Check Git permissions for $(projectName)-administrators group'
+  continueOnError: true
+  env:
+    PROJECT_ID: $(projectId)
+
+- powershell: |
+    python ./common/check_permissions.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --projectId $Env:PROJECT_ID --namespaceId '2e9eb7ed-3c0a-47d4-87c1-0ffdd275fd87' --groupName $(developers-group-name) --groupSid $(developers-group-sid) --allow $(developers-git-allow-permissions) --deny $(developers-git-deny-permissions) --pat $(onprem_pat)
+  displayName: 'Check Git permissions for $(projectName)-developers group'
+  continueOnError: true
+  env:
+    PROJECT_ID: $(projectId)
+
+- powershell: |
+    python ./common/check_permissions.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --projectId $Env:PROJECT_ID --namespaceId '2e9eb7ed-3c0a-47d4-87c1-0ffdd275fd87' --groupName $(auditors-group-name) --groupSid $(auditors-group-sid) --allow $(auditors-git-allow-permissions) --deny $(auditors-git-deny-permissions) --pat $(onprem_pat)
+  displayName: 'Check Git permissions for $(projectName)-auditors group'
+  continueOnError: true
+  env:
+    PROJECT_ID: $(projectId)
+
+- powershell: |
+    python ./common/check_permissions.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --projectId $Env:PROJECT_ID --namespaceId '2e9eb7ed-3c0a-47d4-87c1-0ffdd275fd87' --groupName $(product-owners-group-name) --groupSid $(product-owners-group-sid) --allow $(product-owners-git-allow-permissions) --deny $(product-owners-git-deny-permissions) --pat $(onprem_pat)
+  displayName: 'Check Git permissions for $(projectName)-product-owners group'
+  continueOnError: true
+  env:
+    PROJECT_ID: $(projectId)

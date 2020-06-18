@@ -1,0 +1,36 @@
+steps:
+- task: PythonScript@0
+  inputs:
+    scriptPath: ./common/check_git_policy.py
+    arguments: '--organization https://dev.azure.com/kagarlickij --projectName $(projectName) --maxCommitAge $(maxCommitAge) --maxPullRequestAge $(maxPullRequestAge) --minApproverCount $(minApproverCount) --pat $(cloud_pat)'
+  continueOnError: true
+  displayName: 'Check Git repos settings'
+
+
+- task: PythonScript@0
+  inputs:
+    scriptPath: ./common/check_permissions.py
+    arguments: '--organization https://dev.azure.com/kagarlickij --projectId $(projectId) --namespaceId 2e9eb7ed-3c0a-47d4-87c1-0ffdd275fd87 --groupName $(administrators-group-name) --groupSid $(administrators-group-sid) --allow $(administrators-git-allow-permissions) --deny $(administrators-git-deny-permissions) --pat $(cloud_pat)'
+  continueOnError: true
+  displayName: 'Check Git permissions for $(projectName)-administrators group'
+
+- task: PythonScript@0
+  inputs:
+    scriptPath: ./common/check_permissions.py
+    arguments: '--organization https://dev.azure.com/kagarlickij --projectId $(projectId) --namespaceId 2e9eb7ed-3c0a-47d4-87c1-0ffdd275fd87 --groupName $(developers-group-name) --groupSid $(developers-group-sid) --allow $(developers-git-allow-permissions) --deny $(developers-git-deny-permissions) --pat $(cloud_pat)'
+  continueOnError: true
+  displayName: 'Check Git permissions for $(projectName)-developers group'
+
+- task: PythonScript@0
+  inputs:
+    scriptPath: ./common/check_permissions.py
+    arguments: '--organization https://dev.azure.com/kagarlickij --projectId $(projectId) --namespaceId 2e9eb7ed-3c0a-47d4-87c1-0ffdd275fd87 --groupName $(auditors-group-name) --groupSid $(auditors-group-sid) --allow $(auditors-git-allow-permissions) --deny $(auditors-git-deny-permissions) --pat $(cloud_pat)'
+  continueOnError: true
+  displayName: 'Check Git permissions for $(projectName)-auditors group'
+
+- task: PythonScript@0
+  inputs:
+    scriptPath: ./common/check_permissions.py
+    arguments: '--organization https://dev.azure.com/kagarlickij --projectId $(projectId) --namespaceId 2e9eb7ed-3c0a-47d4-87c1-0ffdd275fd87 --groupName $(product-owners-group-name) --groupSid $(product-owners-group-sid) --allow $(product-owners-git-allow-permissions) --deny $(product-owners-git-deny-permissions) --pat $(cloud_pat)'
+  continueOnError: true
+  displayName: 'Check Git permissions for $(projectName)-product-owners group'

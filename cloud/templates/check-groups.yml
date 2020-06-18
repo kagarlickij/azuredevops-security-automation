@@ -1,0 +1,19 @@
+steps:
+- task: PythonScript@0
+  inputs:
+    scriptPath: ./cloud/get_groups.py
+    arguments: '--organization https://vssps.dev.azure.com/kagarlickij --projectScopeDescriptor $(projectScopeDescriptor) --desiredGroupsList $(administrators-group-name) $(developers-group-name) $(auditors-group-name) $(product-owners-group-name) "$(projectName) Team" "Project Administrators" "Project Valid Users" --pat $(cloud_pat)'
+  displayName: 'Check list of groups'
+
+
+- task: PythonScript@0
+  inputs:
+    scriptPath: ./cloud/get_group_members.py
+    arguments: '--organization kagarlickij --projectScopeDescriptor $(projectScopeDescriptor) --groupName "Project Administrators" --desiredMembersQuantity 1 --pat $(cloud_pat)'
+  displayName: 'Check Project Administrators group members'
+
+- task: PythonScript@0
+  inputs:
+    scriptPath: ./cloud/get_group_members.py
+    arguments: '--organization kagarlickij --projectScopeDescriptor $(projectScopeDescriptor) --groupName "Project Valid Users" --desiredMembersQuantity 0 --pat $(cloud_pat)'
+  displayName: 'Check Project Valid Users group members'

@@ -1,0 +1,16 @@
+steps:
+- powershell: |
+    ./onprem/create_group.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --projectId $(projectId) --groupName $(administrators-group-name) --groupDescription 'ADOS setup, Releases setup (until we have it as code), security changes (both ADOS and app related)'
+  displayName: 'Create $(projectName)-administrators group'
+
+- powershell: |
+    ./onprem/create_group.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --projectId $(projectId) --groupName $(developers-group-name) --groupDescription 'develop apps, develop build pipelines, watching Builds and Releases'
+  displayName: 'Create $(projectName)-developers group'
+
+- powershell: |
+    ./onprem/create_group.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --projectId $(projectId) --groupName $(auditors-group-name) --groupDescription 'checking security configs (current vs desired)'
+  displayName: 'Create $(projectName)-auditors group'
+
+- powershell: |
+    ./onprem/create_group.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --projectId $(projectId) --groupName $(product-owners-group-name) --groupDescription 'manage Release activities'
+  displayName: 'Create $(projectName)-product-owners group'
