@@ -22,7 +22,7 @@ schedules:
 
 variables:
 - name: projectName
-  value: 'templ-test50'
+  value: 'templ-test51'
 - name: createArtifactFeed
   value: true
 - group: ados-group-names-templ-test01

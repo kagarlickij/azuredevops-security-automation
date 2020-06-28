@@ -34,6 +34,6 @@ jobs:
       pip install --disable-pip-version-check --ignore-installed --quiet --version pylint==2.5.0
       pip install --disable-pip-version-check --ignore-installed --quiet anybadge==1.7.0
     displayName: 'Install pylint and anybadge'
-  - powershell: |
-      python ./common/generate_pylint_badge.py --gistId $(gistId) --gitHubPat $(gitHubPat)
-    displayName: 'Generate pylint badge' #TODO: https://stackoverflow.com/questions/62488844/run-pylint-against-all-files-in-windows
+  # - powershell: |
+  #     python ./common/generate_pylint_badge.py --gistId $(gistId) --gitHubPat $(gitHubPat)
+  #   displayName: 'Generate pylint badge' #TODO: https://stackoverflow.com/questions/62488844/run-pylint-against-all-files-in-windows
