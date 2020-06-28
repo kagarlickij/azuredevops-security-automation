@@ -8,6 +8,7 @@ import json
 import argparse
 import os
 import requests
+import anybadge
 
 PARSER = argparse.ArgumentParser()
 
@@ -24,22 +25,10 @@ PYLINT_OUTPUT = subprocess.run(
 PYLINT_SCORE = PYLINT_OUTPUT.split("at ", 1)[1].split("/", 1)[0]
 print(f"[INFO] PYLINT_SCORE: {PYLINT_SCORE}")
 
-ANYBADGE_CMD = [
-    "anybadge",
-    "--overwrite",
-    "--label",
-    "pylint",
-    "--value",
-    f"{PYLINT_SCORE}",
-    "--file",
-    "pylint.svg",
-    "2=red",
-    "4=orange",
-    "8=yellow",
-    "10=green",
-]
+ANYBADGE_THRESHOLDS = {2: "red", 4: "orange", 6: "yellow", 10: "green"}
 
-subprocess.run(ANYBADGE_CMD, check=True, stdout=subprocess.PIPE).stdout.decode("utf-8")
+BADGE = anybadge.Badge("pylint", PYLINT_SCORE, thresholds=ANYBADGE_THRESHOLDS)
+BADGE.write_badge("pylint.svg")
 
 SVG = open("pylint.svg", "r")
 SVG_READ = SVG.read()
