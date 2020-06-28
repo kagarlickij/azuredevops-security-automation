@@ -8,6 +8,12 @@ trigger:
     include:
     - master
 
+pr:
+  autoCancel: false
+  branches:
+    exclude:
+    - '*'
+
 variables:
 - name: gistId
   value: '780fabe68201e08c8f2151ad02898bad'
