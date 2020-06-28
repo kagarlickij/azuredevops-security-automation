@@ -71,7 +71,7 @@ jobs:
       sleep 10
     displayName: 'Wait for Groups objects to become available..'
 
-  - template: ./cloud/templates/export-groups-info.yml
+  - template: ./templates/export-groups-info.yml
   - template: ./templates/set-project-permissions.yml
   - template: ./templates/set-analytics-permissions.yml
   - template: ./templates/set-library-permissions.yml

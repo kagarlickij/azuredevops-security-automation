@@ -56,7 +56,7 @@ jobs:
       arguments: '--organization kagarlickij --projectName $(projectName) --pat $(cloud_pat)'
     displayName: 'Export project-related info'
 
-  - template: ./cloud/templates/export-groups-info.yml
+  - template: ./templates/export-groups-info.yml
   - template: ./templates/check-groups.yml
   - template: ./templates/check-project-permissions.yml
   - template: ./templates/check-analytics-permissions.yml
