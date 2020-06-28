@@ -15,7 +15,7 @@ pr:
 
 variables:
 - name: projectName
-  value: 'templ-test47'
+  value: 'templ-test48'
 
 - group: ados-group-names-templ-test01
 - group: ados-acls-templ-test01
