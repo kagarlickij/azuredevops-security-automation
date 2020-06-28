@@ -39,11 +39,9 @@ jobs:
     inputs:
       versionSpec: 3.7.x
 
-
   - bash: |
       pip install --disable-pip-version-check --ignore-installed --quiet --user --requirement requirements.txt
     displayName: 'Install requirements'
-
 
   - task: PythonScript@0
     inputs:
@@ -51,10 +49,8 @@ jobs:
       arguments: '--organization https://dev.azure.com/kagarlickij --projectName $(projectName) --pat $(cloud_pat)'
     displayName: 'Create $(projectName) project'
 
-
   - bash: sleep 10
     displayName: 'Wait for Project APIs to become available..'
-
 
   - task: PythonScript@0
     inputs:
@@ -62,55 +58,26 @@ jobs:
       arguments: '--organization kagarlickij --projectName $(projectName) --pat $(cloud_pat)'
     displayName: 'Export project-related info'
 
-
   - task: PythonScript@0
     inputs:
       scriptPath: ./common/create_tmp_release_pipeline.py
       arguments: '--organization https://vsrm.dev.azure.com/kagarlickij --projectName $(projectName) --pat $(cloud_pat)'
     displayName: 'Create tmp Release pipeline'
 
-
   - template: ./templates/delete-groups.yml
   - template: ./templates/create-groups.yml
-
 
   - bash: |
       sleep 10
     displayName: 'Wait for Groups objects to become available..'
 
-
-  - task: PythonScript@0
-    inputs:
-      scriptPath: ./cloud/export_group_info.py
-      arguments: '--organization https://vssps.dev.azure.com/kagarlickij --projectScopeDescriptor $(projectScopeDescriptor) --groupName $(administrators-group-name) --groupSid $(administrators-group-sid) --pat $(cloud_pat)'
-    displayName: 'Export $(projectName)-administrators group info'
-
-  - task: PythonScript@0
-    inputs:
-      scriptPath: ./cloud/export_group_info.py
-      arguments: '--organization https://vssps.dev.azure.com/kagarlickij --projectScopeDescriptor $(projectScopeDescriptor) --groupName $(developers-group-name) --groupSid $(developers-group-sid) --pat $(cloud_pat)'
-    displayName: 'Export $(projectName)-developers group info'
-
-  - task: PythonScript@0
-    inputs:
-      scriptPath: ./cloud/export_group_info.py
-      arguments: '--organization https://vssps.dev.azure.com/kagarlickij --projectScopeDescriptor $(projectScopeDescriptor) --groupName $(auditors-group-name) --groupSid $(auditors-group-sid) --pat $(cloud_pat)'
-    displayName: 'Export $(projectName)-auditors group info'
-
-  - task: PythonScript@0
-    inputs:
-      scriptPath: ./cloud/export_group_info.py
-      arguments: '--organization https://vssps.dev.azure.com/kagarlickij --projectScopeDescriptor $(projectScopeDescriptor) --groupName $(product-owners-group-name) --groupSid $(product-owners-group-sid) --pat $(cloud_pat)'
-    displayName: 'Export $(projectName)-product-owners group info'
-
-
+  - template: ./cloud/templates/export-groups-info.yml
   - template: ./templates/set-project-permissions.yml
   - template: ./templates/set-analytics-permissions.yml
   - template: ./templates/set-library-permissions.yml
   - template: ./templates/set-git.yml
   - template: ./templates/set-build-permissions.yml
   - template: ./templates/set-release-permissions.yml
-
 
   - task: PythonScript@0
     inputs:

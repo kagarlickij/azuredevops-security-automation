@@ -50,8 +50,8 @@ And to keep operations happy, both projects creation and verification is automat
 1. Fork this repo
 2. Put name of the new project name to `projectName` variable in [./cloud/create-project.yml](./cloud/create-project.yml) & [./cloud/check-project.yml](./cloud/check-project.yml) for Cloud and [./onprem/create-project.yml](./onprem/create-project.yml) & [./onprem/check-project.yml](./onprem/check-project.yml) for on-premise
 3. Clone or create new Variable groups - `ados-group-names-$projectName` and `ados-acls-$projectName`
-4. If you cloned Variable groups ensure that you're happy with values - **both Variable groups keys and values are described in detail below**
-5. Put Variable group names to [./cloud/create-project.yml](./cloud/create-project.yml) & [./cloud/check-project.yml](./cloud/check-project.yml) for Cloud and [./onprem/create-project.yml](./onprem/create-project.yml) & [./onprem/check-project.yml](./onprem/check-project.yml) for on-premise
+4. If you cloned Variable groups ensure that you're happy with values - **Variable groups keys and values are described in detail below**
+5. Put cloned Variable group names to [./cloud/create-project.yml](./cloud/create-project.yml) & [./cloud/check-project.yml](./cloud/check-project.yml) for Cloud and [./onprem/create-project.yml](./onprem/create-project.yml) & [./onprem/check-project.yml](./onprem/check-project.yml) for on-premise
 6. Create new Azure DevOps pipeline using [./cloud/create-project.yml](./cloud/create-project.yml) for Cloud and [./onprem/create-project.yml](./onprem/create-project.yml) for on-premise, rename pipeline (e.g. `create-$projectName`), run it and check logs
 7. Create new Azure DevOps pipeline using [./cloud/check-project.yml](./cloud/check-project.yml) for Cloud and [./onprem/check-project.yml](./onprem/check-project.yml) for on-premise, rename pipeline (e.g. `check-$projectName`), run it and check logs
 
@@ -67,10 +67,10 @@ new `https://vssps.dev.azure.com/{organization}/_apis/graph/groups?scopeDescript
 Here's summary of scripts vs used APIs (actions should be understandable from script names):  
 `https://dev.azure.com` version `5.0` (can be switched to `5.1` if necessary):
 1. [./common/create_project](./common/create_project.py)
-2. [./common/get_permissions](./common/check_permissions.py)
+2. [./common/check_permissions](./common/check_permissions.py)
 3. [./common/set_permissions](./common/set_permissions.py)
-4. [./common/check_git_repos](./common/check_git_policy.py)
-5. [./common/set_git_repos](./common/set_git_policy.py)
+4. [./common/check_git_policy](./common/check_git_policy.py)
+5. [./common/set_git_policy](./common/set_git_policy.py)
 6. [./cloud/export_project_info](./cloud/export_project_info.py)  
 
 For on-premise link will be `server_url/collection`, e.g. `https://ados.demo.kagarlickij.com/DefaultCollection`  
@@ -228,31 +228,36 @@ Nothing too special here, token in this security namespace is equal to project i
 13. Set Release permissions for each group  
 This task will fail if tmp Release pipeline was not created (Step #3)  
 
-14. Create Artifact feed  
+14. Delete tmp Release pipeline  
+Dummy release pipeline has not be present anymore
+
+15. Create Artifact feed (optional)  
+For cloud scenario `createArtifactFeed` parameter must be set `true` for feed to be created  
+For on-premise [parameters are not supported](https://stackoverflow.com/questions/62449727/azure-devops-server-2019-condition-for-task-execution) so `createArtifactFeed` is variable used in [create-feed](./onprem/templates/create-feed.yml) and [check-feed-permissions](./onprem/templates/check-feed-permissions.yml) for the same purpose  
 `https://feeds.dev.azure.com/{organization}/_apis/packaging/feeds?api-version=5.0-preview.1` API used for cloud and `{server_ur}/{collection}/_apis/packaging/feeds?api-version=5.0-preview.1` API used for on-premise  
 Feed has default capabilities and upstream disabled - all is hardcoded in [./common/create_feed.py](./common/create_feed.py)  
 
-15. Export feed info  
+16. Export feed info  
 `FEED_ID` variable is exported for further usage  
 
-16. Set feed permissions
+17. Set feed permissions
 As described above, feeds use roles instead of permissions "bits" so [./common/set_feed_permissions.py](./common/set_feed_permissions.py) script is used instead of [./common/set_permissions.py](./common/set_permissions.py)  
 
 # `check-project` pipeline
 1. Export project-related info  
 As mentioned above `PROJECT_ID` and `PROJECT_SCOPE_DESCRIPTOR` variables are exported for further usage  
 
-2. Check list of groups  
+2. Export group-related info  
+Exports group SID as a var for further usage  
+Format of SID from time to time causes incorrect padding in Python so [fix](https://stackoverflow.com/questions/2941995/python-ignore-incorrect-padding-error-when-base64-decoding) is applied  
+
+3. Check list of groups  
 Checks if no additional groups were created and/or existing groups deleted/renamed  
 
-3. Check group members  
+4. Check group members  
 Checks only default groups that can't be deleted: 'Project Valid Users' and 'Project Administrators'  
 Nobody should be added to those groups, so desired quantity of members is 0  
 However creator of the project (user, whose PAT was used in pipeline) is set to be member of 'Project Administrators', so for 'Project Administrators' desired quantity of members is 1  
-
-4. Export group-related info  
-Exports group SID as a var for further usage  
-Format of SID from time to time causes incorrect padding in Python so [fix](https://stackoverflow.com/questions/2941995/python-ignore-incorrect-padding-error-when-base64-decoding) is applied  
 
 5. Check Project permissions for each group  
 [./common/check_permissions.py](./common/check_permissions.py) script will check if current Project scope permissions match desired  
@@ -281,11 +286,13 @@ Some repos can be excluded from checking by putting repo name to [excluded_repos
 11. Check Release permissions for each group  
 [./common/check_permissions.py](./common/check_permissions.py) script will check if current permissions match desired  
 
-12. Export feed info  
+12. Export feed info (optional)  
 `FEED_ID` var is exported for further usage  
+Conditions are the same as for `create-project`
 
-13. Check Artifact feed permissions for each group  
+13. Check Artifact feed permissions for each group (optional)  
 [./common/check_feed_permissions.py](./common/check_feed_permissions.py) script is used instead of [./common/check_permissions.py](./common/check_permissions.py) because `https://feeds.dev.azure.com` API is used  
+Conditions are the same as for `create-project`  
 
 # Pipelines execution
 ## Triggers
@@ -379,13 +386,19 @@ If you want to add more groups or remove some of existing don't forget to change
 | maxPullRequestAge | 5 |
 | minApproverCount | 1 |
 
-`ados-secrets` group contains Personal Access Token that is used for all API actions, described in details above in "Personal vs System access token" section
+`ados-secrets` group contains Azure DevOps Personal Access Token that is used for all API actions, described in details above in "Personal vs System access token" section
 | Name | Value |
 | ------------- | ------------- |
 | cloud_pat | ***** |
 | onprem_pat | ***** |
 `*****` - because marked as secret  
 If you use cloud Azure DevOps you need only `cloud_pat` and if you use on-premise Azure DevOps you need only `onprem_pat`  
+
+`github-secrets` group contains GitHub Personal Access Token that is used for all API actions, described in details in "Build" section
+| Name | Value |
+| ------------- | ------------- |
+| gitHubPat | ***** |
+`*****` - because marked as secret  
 
 ## Azure DevOps specific syntax in scripts
 1. All `print` functions have `[INFO]` or `[ERROR]` prefixes to make output more readable and properly [colored in Azure DevOps logs](https://developercommunity.visualstudio.com/content/problem/440605/write-host-foreground-color-with-powershell-task-i.html), [example](https://prnt.sc/rqzu2x)  
@@ -407,11 +420,18 @@ If you need to remove pre-commit run: `pre-commit install && pre-commit uninstal
 Both checks are executed only if Python code was updated  
 Both checks require binaries to be installed in advance: `pip install black` and `pip install bandit`  
 
-## Pull request validation
-Both [Black](https://github.com/psf/black) and [Bandit](https://github.com/PyCQA/bandit) checks are up to developer, but before code is merged into `master` it must pass `pylint` check and Pull request will be marked as failed if score is lower than 8/10  
+## Pull request validation:
+1. `Lint Python code`: Both [Black](https://github.com/psf/black) and [Bandit](https://github.com/PyCQA/bandit) checks are up to developer, but before code is merged into `master` it must pass `pylint` check and Pull request will be marked as failed if score is lower than 8/10  
 A few irrelevant for the project issues are added as exceptions to [pylintrc](.pylintrc)  
+2. `Create project` to verify if code in Pull request works - all steps match `create-project` pipeline, artifact feed is enabled  
+Project name is based on Pull request number: `prj-template-$(Build.BuildId)-prv`  
+3. `Run positive project check` to verify if it was created correctly and matches desired security rules - all steps match `check-project` pipeline, artifact feed is enabled  
+4. `Break project`: Change security settings to make project "broken"  
+5. `Run negative project check` to verify if security violations are noticed by checks - all steps match `check-project` pipeline, artifact feed is enabled  
+This job's successful result is "warning", "success" will mean fail like in typical negative check  
+6. `Delete project` when checks are done tmp project is deleted  
 
 ## Build
 When code is merged into `master` branch build job generates pylint badge referenced on top of this file  
 [generate_pylint_badge](generate_pylint_badge.py) script uses [pylint](https://www.pylint.org/) to generate score, [anybadge](https://pypi.org/project/anybadge/) to generate png and [GitHub Gist API](https://developer.github.com/v3/gists/) to push svg to [GitHub Gist](https://gist.githubusercontent.com/kagarlickij/780fabe68201e08c8f2151ad02898bad/raw/pylint.svg) which is used for svg hosting  
-[Validation pipeline](validation.yml) installs `pylint` and `anybadge` binaries on Azure DevOps agent for [generate_pylint_badge](generate_pylint_badge.py) script because Python packages for both `pylint` and `anybadge` don't work correctly: [anybadge issue](https://github.com/jongracecox/anybadge/issues/42), [epylint issue](https://stackoverflow.com/questions/61485537/epylint-output-to-variable)
+[Build pipeline](./cloud/build.yml) installs `pylint` and `anybadge` binaries on Azure DevOps agent for [generate_pylint_badge](./common/generate_pylint_badge.py) script because Python packages for both `pylint` and `anybadge` don't work correctly: [anybadge issue](https://github.com/jongracecox/anybadge/issues/42), [epylint issue](https://stackoverflow.com/questions/61485537/epylint-output-to-variable)

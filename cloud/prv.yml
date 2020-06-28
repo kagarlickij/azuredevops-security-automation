@@ -1,0 +1,236 @@
+resources:
+- repo: self
+  clean: true
+
+trigger:
+  batch: true
+  branches:
+    exclude:
+    - '*'
+
+pr:
+  autoCancel: false
+  branches:
+    include:
+    - master
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+- name: projectName
+  value: 'prj-template-$(Build.BuildId)-prv'
+- group: ados-group-names-templ-test01
+- group: ados-acls-templ-test01
+- group: ados-git-params-templ-test01
+- group: ados-secrets
+
+jobs:
+- job: pylint
+  displayName: 'Lint Python code'
+  condition: eq(variables['System.PullRequest.TargetBranch'], 'master')
+  steps:
+  - task: UsePythonVersion@0
+    displayName: 'Use Python 3.7.x'
+    inputs:
+      versionSpec: 3.7.x
+  - bash: |
+      pip install --disable-pip-version-check --ignore-installed --quiet --requirement requirements.txt
+    displayName: 'Install Python requirements'
+  - bash: |
+      pip install --disable-pip-version-check --ignore-installed --quiet --version pylint==2.5.0
+    displayName: 'Install Python linter'
+  - bash: |
+      pylint ./**/*.py --fail-under 8
+    displayName: 'Run Python linter'
+
+- job: create_project
+  displayName: 'Create project'
+  dependsOn:
+  - pylint
+  steps:
+  - task: UsePythonVersion@0
+    displayName: 'Use Python 3.7.x'
+    inputs:
+      versionSpec: 3.7.x
+
+  - bash: |
+      pip install --disable-pip-version-check --ignore-installed --quiet --user --requirement requirements.txt
+    displayName: 'Install requirements'
+
+  - task: PythonScript@0
+    inputs:
+      scriptPath: ./common/create_project.py
+      arguments: '--organization https://dev.azure.com/kagarlickij --projectName $(projectName) --pat $(cloud_pat)'
+    displayName: 'Create $(projectName) project'
+
+  - bash: sleep 10
+    displayName: 'Wait for Project APIs to become available..'
+
+  - task: PythonScript@0
+    inputs:
+      scriptPath: ./cloud/export_project_info.py
+      arguments: '--organization kagarlickij --projectName $(projectName) --pat $(cloud_pat)'
+    displayName: 'Export project-related info'
+
+  - task: PythonScript@0
+    inputs:
+      scriptPath: ./common/create_tmp_release_pipeline.py
+      arguments: '--organization https://vsrm.dev.azure.com/kagarlickij --projectName $(projectName) --pat $(cloud_pat)'
+    displayName: 'Create tmp Release pipeline'
+
+  - template: ./templates/delete-groups.yml
+  - template: ./templates/create-groups.yml
+
+  - bash: |
+      sleep 10
+    displayName: 'Wait for Groups objects to become available..'
+
+  - template: ./templates/export-groups-info.yml
+  - template: ./templates/set-project-permissions.yml
+  - template: ./templates/set-analytics-permissions.yml
+  - template: ./templates/set-library-permissions.yml
+  - template: ./templates/set-git.yml
+  - template: ./templates/set-build-permissions.yml
+  - template: ./templates/set-release-permissions.yml
+
+  - task: PythonScript@0
+    inputs:
+      scriptPath: ./common/delete_tmp_release_pipeline.py
+      arguments: '--organization https://vsrm.dev.azure.com/kagarlickij --projectName $(projectName) --pat $(cloud_pat)'
+    displayName: 'Delete tmp Release pipeline'
+
+  - template: ./templates/create-feed.yml
+
+- job: check_project_positive
+  displayName: 'Run positive project check'
+  dependsOn:
+  - create_project
+  steps:
+  - task: UsePythonVersion@0
+    displayName: 'Use Python 3.7.x'
+    inputs:
+      versionSpec: 3.7.x
+
+  - bash: |
+      pip install --disable-pip-version-check --ignore-installed --quiet --user --requirement requirements.txt
+    displayName: 'Install requirements'
+
+  - task: PythonScript@0
+    inputs:
+      scriptPath: ./cloud/export_project_info.py
+      arguments: '--organization kagarlickij --projectName $(projectName) --pat $(cloud_pat)'
+    displayName: 'Export project-related info'
+
+  - template: ./templates/export-groups-info.yml
+  - template: ./templates/check-groups.yml
+  - template: ./templates/check-project-permissions.yml
+  - template: ./templates/check-analytics-permissions.yml
+  - template: ./templates/check-library-permissions.yml
+  - template: ./templates/check-git.yml
+  - template: ./templates/check-build-permissions.yml
+  - template: ./templates/check-release-permissions.yml
+  - template: ./templates/check-feed-permissions.yml
+
+- job: break_project
+  displayName: 'Break project'
+  dependsOn:
+  - check_project_positive
+  steps:
+  - task: UsePythonVersion@0
+    displayName: 'Use Python 3.7.x'
+    inputs:
+      versionSpec: 3.7.x
+
+  - bash: |
+      pip install --disable-pip-version-check --ignore-installed --quiet --user --requirement requirements.txt
+    displayName: 'Install requirements'
+
+  - task: PythonScript@0
+    inputs:
+      scriptPath: ./cloud/export_project_info.py
+      arguments: '--organization kagarlickij --projectName $(projectName) --pat $(cloud_pat)'
+    displayName: 'Export project-related info'
+
+  - template: ./templates/export-groups-info.yml
+
+  - task: PythonScript@0
+    inputs:
+      scriptPath: ./common/set_permissions.py
+      arguments: '--organization https://dev.azure.com/kagarlickij --projectId $(projectId) --namespaceId 52d39943-cb85-4d7f-8fa8-c6baac873819 --groupName $(administrators-group-name) --groupSid $(administrators-group-sid) --allow $(developers-project-allow-permissions) --deny $(developers-project-deny-permissions) --pat $(cloud_pat)'
+    displayName: 'Set Project permissions for $(projectName)-administrators group'
+
+  - task: PythonScript@0
+    inputs:
+      scriptPath: ./common/set_permissions.py
+      arguments: '--organization https://dev.azure.com/kagarlickij --projectId $(projectId) --namespaceId 2e9eb7ed-3c0a-47d4-87c1-0ffdd275fd87 --groupName $(developers-group-name) --groupSid $(developers-group-sid) --allow $(administrators-git-allow-permissions) --deny $(administrators-git-deny-permissions) --pat $(cloud_pat)'
+    displayName: 'Set Git permissions for $(projectName)-developers group'
+
+  - task: PythonScript@0
+    inputs:
+      scriptPath: ./common/set_permissions.py
+      arguments: '--organization https://dev.azure.com/kagarlickij --projectId $(projectId) --namespaceId 33344d9c-fc72-4d6f-aba5-fa317101a7e9 --groupName $(auditors-group-name) --groupSid $(auditors-group-sid) --allow $(product-owners-build-allow-permissions) --deny $(product-owners-build-deny-permissions) --pat $(cloud_pat)'
+    displayName: 'Set Build permissions for $(projectName)-auditors group'
+
+  - task: PythonScript@0
+    inputs:
+      scriptPath: ./common/set_permissions.py
+      arguments: '--organization https://dev.azure.com/kagarlickij --projectId $(projectId) --namespaceId c788c23e-1b46-4162-8f5e-d7585343b5de --groupName $(product-owners-group-name) --groupSid $(product-owners-group-sid) --allow $(auditors-release-allow-permissions) --deny $(auditors-release-deny-permissions) --pat $(cloud_pat)'
+    displayName: 'Set Release permissions for $(projectName)-product-owners group'
+
+
+- job: check_project_negative
+  displayName: 'Run negative project check'
+  dependsOn:
+  - break_project
+  steps:
+  - task: UsePythonVersion@0
+    displayName: 'Use Python 3.7.x'
+    inputs:
+      versionSpec: 3.7.x
+
+  - bash: |
+      pip install --disable-pip-version-check --ignore-installed --quiet --user --requirement requirements.txt
+    displayName: 'Install requirements'
+
+  - task: PythonScript@0
+    inputs:
+      scriptPath: ./cloud/export_project_info.py
+      arguments: '--organization kagarlickij --projectName $(projectName) --pat $(cloud_pat)'
+    displayName: 'Export project-related info'
+
+  - template: ./templates/export-groups-info.yml
+  - template: ./templates/check-groups.yml
+  - template: ./templates/check-project-permissions.yml
+  - template: ./templates/check-analytics-permissions.yml
+  - template: ./templates/check-library-permissions.yml
+  - template: ./templates/check-git.yml
+  - template: ./templates/check-build-permissions.yml
+  - template: ./templates/check-release-permissions.yml
+  - template: ./templates/check-feed-permissions.yml
+
+- job: delete_project
+  displayName: 'Delete project'
+  dependsOn:
+  - check_project_negative
+  steps:
+  - task: UsePythonVersion@0
+    displayName: 'Use Python 3.7.x'
+    inputs:
+      versionSpec: 3.7.x
+
+  - bash: |
+      pip install --disable-pip-version-check --ignore-installed --quiet --user --requirement requirements.txt
+    displayName: 'Install requirements'
+
+  - task: PythonScript@0
+    inputs:
+      scriptPath: ./cloud/export_project_info.py
+      arguments: '--organization kagarlickij --projectName $(projectName) --pat $(cloud_pat)'
+    displayName: 'Export project-related info'
+
+  - task: PythonScript@0
+    inputs:
+      scriptPath: ./common/delete_project.py
+      arguments: '--organization https://dev.azure.com/kagarlickij --projectName $(projectName) --projectId $(projectId) --pat $(cloud_pat)'
+    displayName: 'Delete project'

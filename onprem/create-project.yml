@@ -15,18 +15,14 @@ pr:
 
 variables:
 - name: projectName
-  value: 'templ-test47'
+  value: 'templ-test50'
+- name: createArtifactFeed
+  value: true
 
 - group: ados-group-names-templ-test01
 - group: ados-acls-templ-test01
 - group: ados-git-params-templ-test01
 - group: ados-secrets
-
-parameters:
-- name: createArtifactFeed
-  displayName: 'Create Artifact Feed?'
-  type: boolean
-  default: true
 
 jobs:
 - job: create_project
@@ -44,47 +40,25 @@ jobs:
       python ./common/create_project.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --projectName $(projectName) --pat $(onprem_pat)
     displayName: 'Create $(projectName) project'
 
-
   - powershell: sleep 20
     displayName: 'Wait for Project APIs to become available..'
-
 
   - powershell: |
       python ./onprem/export_project_info.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --projectName $(projectName) --pat $(onprem_pat)
     displayName: 'Export project-related info'
 
-
   - powershell: |
       python ./common/create_tmp_release_pipeline.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --projectName $(projectName) --pat $(onprem_pat)
     displayName: 'Create tmp Release pipeline'
 
-
   - template: ./templates/delete-groups.yml
   - template: ./templates/create-groups.yml
-
 
   - powershell: |
       sleep 10
     displayName: 'Wait for Groups objects to become available..'
 
-
-  - powershell: |
-      python ./onprem/export_group_info.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --projectId $(projectId) --groupName $(administrators-group-name) --groupSid $(administrators-group-sid)
-    displayName: 'Export $(projectName)-administrators group info'
-
-  - powershell: |
-      python ./onprem/export_group_info.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --projectId $(projectId) --groupName $(developers-group-name) --groupSid $(developers-group-sid)
-    displayName: 'Export $(projectName)-developers group info'
-
-  - powershell: |
-      python ./onprem/export_group_info.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --projectId $(projectId) --groupName $(auditors-group-name) --groupSid $(auditors-group-sid)
-    displayName: 'Export $(projectName)-auditors group info'
-
-  - powershell: |
-      python ./onprem/export_group_info.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --projectId $(projectId) --groupName $(product-owners-group-name) --groupSid $(product-owners-group-sid)
-    displayName: 'Export $(projectName)-product-owners group info'
-
-
+  - template: ./templates/export-groups-info.yml
   - template: ./templates/set-project-permissions.yml
   - template: ./templates/set-analytics-permissions.yml
   - template: ./templates/set-library-permissions.yml
@@ -92,11 +66,8 @@ jobs:
   - template: ./templates/set-build-permissions.yml
   - template: ./templates/set-release-permissions.yml
 
-
   - powershell: |
       python ./common/delete_tmp_release_pipeline.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --projectName $(projectName) --pat $(onprem_pat)
     displayName: 'Delete tmp Release pipeline'
 
-
-  - ${{ if eq(parameters.createArtifactFeed, true) }}:
-    - template: ./templates/create-feed.yml
+  - template: ./templates/create-feed.yml

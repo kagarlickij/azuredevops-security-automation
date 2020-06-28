@@ -1,0 +1,212 @@
+resources:
+- repo: self
+  clean: true
+
+trigger:
+  batch: true
+  branches:
+    exclude:
+    - '*'
+
+pr:
+  autoCancel: false
+  branches:
+    include:
+    - master
+
+variables:
+- name: projectName
+  value: 'prj-template-$(Build.BuildId)-prv'
+- name: createArtifactFeed
+  value: true
+- group: ados-group-names-templ-test01
+- group: ados-acls-templ-test01
+- group: ados-git-params-templ-test01
+- group: ados-secrets
+
+jobs:
+- job: pylint
+  displayName: 'Lint Python code'
+  condition: eq(variables['System.PullRequest.TargetBranch'], 'master')
+  pool:
+    name: Default
+  steps:
+  - powershell: |
+      $env:Path += ";C:\Users\Administrator\AppData\Roaming\Python\Python38\Scripts"
+      pip install --disable-pip-version-check --ignore-installed --quiet --user --requirement requirements.txt
+    displayName: 'Install Python requirements'
+  - powershell: |
+      $env:Path += ";C:\Users\Administrator\AppData\Roaming\Python\Python38\Scripts"
+      pip install --disable-pip-version-check --ignore-installed --quiet --version pylint==2.5.0
+    displayName: 'Install Python linter'
+  # - powershell: | #TODO: https://stackoverflow.com/questions/62488844/run-pylint-against-all-files-in-windows
+  #     $env:Path += ";C:\Users\Administrator\AppData\Roaming\Python\Python38\Scripts"
+  #     pylint ./**/*.py --fail-under 8
+  #   displayName: 'Run Python linter'
+
+
+- job: create_project
+  displayName: 'Create project'
+  pool:
+    name: Default
+  dependsOn:
+  - pylint
+  steps:
+  - powershell: |
+      $env:Path += ";C:\Users\Administrator\AppData\Roaming\Python\Python38\Scripts"
+      pip install --disable-pip-version-check --ignore-installed --quiet --user --requirement requirements.txt
+    displayName: 'Install Python requirements'
+
+  - powershell: |
+      python ./common/create_project.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --projectName $(projectName) --pat $(onprem_pat)
+    displayName: 'Create $(projectName) project'
+
+  - powershell: sleep 20
+    displayName: 'Wait for Project APIs to become available..'
+
+  - powershell: |
+      python ./onprem/export_project_info.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --projectName $(projectName) --pat $(onprem_pat)
+    displayName: 'Export project-related info'
+
+  - powershell: |
+      python ./common/create_tmp_release_pipeline.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --projectName $(projectName) --pat $(onprem_pat)
+    displayName: 'Create tmp Release pipeline'
+
+  - template: ./templates/delete-groups.yml
+  - template: ./templates/create-groups.yml
+
+  - powershell: |
+      sleep 10
+    displayName: 'Wait for Groups objects to become available..'
+
+  - template: ./templates/export-groups-info.yml
+  - template: ./templates/set-project-permissions.yml
+  - template: ./templates/set-analytics-permissions.yml
+  - template: ./templates/set-library-permissions.yml
+  - template: ./templates/set-git.yml
+  - template: ./templates/set-build-permissions.yml
+  - template: ./templates/set-release-permissions.yml
+
+  - powershell: |
+      python ./common/delete_tmp_release_pipeline.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --projectName $(projectName) --pat $(onprem_pat)
+    displayName: 'Delete tmp Release pipeline'
+
+  - template: ./templates/create-feed.yml
+
+
+- job: check_project_positive
+  displayName: 'Run positive project check'
+  pool:
+    name: Default
+  dependsOn:
+  - create_project
+  steps:
+  - powershell: |
+      $env:Path += ";C:\Users\Administrator\AppData\Roaming\Python\Python38\Scripts"
+      pip install --disable-pip-version-check --ignore-installed --quiet --user --requirement requirements.txt
+    displayName: 'Install Python requirements'
+
+  - powershell: |
+      python ./onprem/export_project_info.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --projectName $(projectName) --pat $(onprem_pat)
+    displayName: 'Export project-related info'
+
+  - template: ./templates/export-groups-info.yml
+  - template: ./templates/check-groups.yml
+  - template: ./templates/check-project-permissions.yml
+  - template: ./templates/check-analytics-permissions.yml
+  - template: ./templates/check-library-permissions.yml
+  - template: ./templates/check-git.yml
+  - template: ./templates/check-build-permissions.yml
+  - template: ./templates/check-release-permissions.yml
+  - template: ./templates/check-feed-permissions.yml
+
+
+- job: break_project
+  displayName: 'Break project'
+  pool:
+    name: Default
+  dependsOn:
+  - check_project_positive
+  steps:
+  - powershell: |
+      $env:Path += ";C:\Users\Administrator\AppData\Roaming\Python\Python38\Scripts"
+      pip install --disable-pip-version-check --ignore-installed --quiet --user --requirement requirements.txt
+    displayName: 'Install Python requirements'
+
+  - powershell: |
+      python ./onprem/export_project_info.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --projectName $(projectName) --pat $(onprem_pat)
+    displayName: 'Export project-related info'
+
+  - template: ./templates/export-groups-info.yml
+
+  - powershell: |
+      python ./common/set_permissions.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --projectId $Env:PROJECT_ID --namespaceId '52d39943-cb85-4d7f-8fa8-c6baac873819' --groupName $(administrators-group-name) --groupSid $(administrators-group-sid) --allow $(developers-git-allow-permissions) --deny $(developers-git-deny-permissions) --pat $(onprem_pat)
+    displayName: 'Set Project permissions for $(projectName)-administrators group'
+    env:
+      PROJECT_ID: $(projectId)
+
+  - powershell: |
+      python ./common/set_permissions.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --projectId $Env:PROJECT_ID --namespaceId '2e9eb7ed-3c0a-47d4-87c1-0ffdd275fd87' --groupName $(developers-group-name) --groupSid $(developers-group-sid) --allow $(administrators-git-allow-permissions) --deny $(administrators-git-deny-permissions) --pat $(onprem_pat)
+    displayName: 'Set Git permissions for $(projectName)-developers group'
+    env:
+      PROJECT_ID: $(projectId)
+
+  - powershell: |
+      python ./common/set_permissions.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --projectId $Env:PROJECT_ID --namespaceId '33344d9c-fc72-4d6f-aba5-fa317101a7e9' --groupName $(auditors-group-name) --groupSid $(auditors-group-sid) --allow $(product-owners-git-allow-permissions) --deny $(product-owners-git-deny-permissions) --pat $(onprem_pat)
+    displayName: 'Set Build permissions for $(projectName)-auditors group'
+    env:
+      PROJECT_ID: $(projectId)
+
+  - powershell: |
+      python ./common/set_permissions.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --projectId $Env:PROJECT_ID --namespaceId 'c788c23e-1b46-4162-8f5e-d7585343b5de' --groupName $(product-owners-group-name) --groupSid $(product-owners-group-sid) --allow $(auditors-git-allow-permissions) --deny $(auditors-git-deny-permissions) --pat $(onprem_pat)
+    displayName: 'Set Release permissions for $(projectName)-product-owners group'
+    env:
+      PROJECT_ID: $(projectId)
+
+
+- job: check_project_negative
+  displayName: 'Run negative project check'
+  pool:
+    name: Default
+  dependsOn:
+  - break_project
+  steps:
+  - powershell: |
+      $env:Path += ";C:\Users\Administrator\AppData\Roaming\Python\Python38\Scripts"
+      pip install --disable-pip-version-check --ignore-installed --quiet --user --requirement requirements.txt
+    displayName: 'Install Python requirements'
+
+  - powershell: |
+      python ./onprem/export_project_info.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --projectName $(projectName) --pat $(onprem_pat)
+    displayName: 'Export project-related info'
+
+  - template: ./templates/export-groups-info.yml
+  - template: ./templates/check-groups.yml
+  - template: ./templates/check-project-permissions.yml
+  - template: ./templates/check-analytics-permissions.yml
+  - template: ./templates/check-library-permissions.yml
+  - template: ./templates/check-git.yml
+  - template: ./templates/check-build-permissions.yml
+  - template: ./templates/check-release-permissions.yml
+  - template: ./templates/check-feed-permissions.yml
+
+
+- job: delete_project
+  displayName: 'Delete project'
+  pool:
+    name: Default
+  dependsOn:
+  - check_project_negative
+  steps:
+  - powershell: |
+      $env:Path += ";C:\Users\Administrator\AppData\Roaming\Python\Python38\Scripts"
+      pip install --disable-pip-version-check --ignore-installed --quiet --user --requirement requirements.txt
+    displayName: 'Install Python requirements'
+
+  - powershell: |
+      python ./onprem/export_project_info.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --projectName $(projectName) --pat $(onprem_pat)
+    displayName: 'Export project-related info'
+
+  - powershell: |
+      python ./common/delete_project.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --projectName $(projectName) --projectId $(projectId) --pat $(onprem_pat)
+    displayName: 'Delete project'

@@ -1,0 +1,38 @@
+resources:
+- repo: self
+  clean: true
+
+trigger:
+  batch: true
+  branches:
+    include:
+    - master
+
+variables:
+- name: gistId
+  value: '780fabe68201e08c8f2151ad02898bad'
+- group: github-secrets
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+jobs:
+- job: build
+  condition: contains(variables['Build.SourceBranch'], 'refs/heads/master')
+  steps:
+  - task: UsePythonVersion@0
+    displayName: 'Use Python 3.7.x'
+    inputs:
+      versionSpec: 3.7.x
+  - bash: |
+      pip install --disable-pip-version-check --ignore-installed --quiet --requirement requirements.txt
+    displayName: 'Install Python requirements'
+  - bash: |
+      pip install --disable-pip-version-check --ignore-installed --quiet --version pylint==2.5.0
+      pip install --disable-pip-version-check --ignore-installed --quiet anybadge==1.7.0
+    displayName: 'Install pylint and anybadge'
+  - task: PythonScript@0
+    displayName: 'Generate pylint badge'
+    inputs:
+      scriptPath: ./common/generate_pylint_badge.py
+      arguments: '--gistId $(gistId) --gitHubPat $(gitHubPat)'

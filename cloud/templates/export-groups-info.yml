@@ -1,0 +1,24 @@
+steps:
+- task: PythonScript@0
+  inputs:
+    scriptPath: ./cloud/export_group_info.py
+    arguments: '--organization https://vssps.dev.azure.com/kagarlickij --projectScopeDescriptor $(projectScopeDescriptor) --groupName $(administrators-group-name) --groupSid $(administrators-group-sid) --pat $(cloud_pat)'
+  displayName: 'Export $(projectName)-administrators group info'
+
+- task: PythonScript@0
+  inputs:
+    scriptPath: ./cloud/export_group_info.py
+    arguments: '--organization https://vssps.dev.azure.com/kagarlickij --projectScopeDescriptor $(projectScopeDescriptor) --groupName $(developers-group-name) --groupSid $(developers-group-sid) --pat $(cloud_pat)'
+  displayName: 'Export $(projectName)-developers group info'
+
+- task: PythonScript@0
+  inputs:
+    scriptPath: ./cloud/export_group_info.py
+    arguments: '--organization https://vssps.dev.azure.com/kagarlickij --projectScopeDescriptor $(projectScopeDescriptor) --groupName $(auditors-group-name) --groupSid $(auditors-group-sid) --pat $(cloud_pat)'
+  displayName: 'Export $(projectName)-auditors group info'
+
+- task: PythonScript@0
+  inputs:
+    scriptPath: ./cloud/export_group_info.py
+    arguments: '--organization https://vssps.dev.azure.com/kagarlickij --projectScopeDescriptor $(projectScopeDescriptor) --groupName $(product-owners-group-name) --groupSid $(product-owners-group-sid) --pat $(cloud_pat)'
+  displayName: 'Export $(projectName)-product-owners group info'

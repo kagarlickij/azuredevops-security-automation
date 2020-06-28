@@ -1,0 +1,16 @@
+steps:
+- powershell: |
+    python ./onprem/export_group_info.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --projectId $(projectId) --groupName $(administrators-group-name) --groupSid $(administrators-group-sid)
+  displayName: 'Export $(projectName)-administrators group info'
+
+- powershell: |
+    python ./onprem/export_group_info.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --projectId $(projectId) --groupName $(developers-group-name) --groupSid $(developers-group-sid)
+  displayName: 'Export $(projectName)-developers group info'
+
+- powershell: |
+    python ./onprem/export_group_info.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --projectId $(projectId) --groupName $(auditors-group-name) --groupSid $(auditors-group-sid)
+  displayName: 'Export $(projectName)-auditors group info'
+
+- powershell: |
+    python ./onprem/export_group_info.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --projectId $(projectId) --groupName $(product-owners-group-name) --groupSid $(product-owners-group-sid)
+  displayName: 'Export $(projectName)-product-owners group info'

@@ -1,8 +1,14 @@
 steps:
 - powershell: |
+    python ./common/export_feed_info.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --feedName $(projectName) --pat $(onprem_pat)
+  displayName: 'Export feed-related info'
+  condition: ne(variables.createArtifactFeed,false)
+
+- powershell: |
     python ./common/check_feed_permissions.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --groupName $(administrators-group-name) --groupSid $(administrators-group-sid) --feedId $Env:FEED_ID --role $(administrators-feed-permissions) --pat $(onprem_pat)
   displayName: 'Check Feed permissions for $(projectName)-administrators group'
   continueOnError: true
+  condition: ne(variables.createArtifactFeed,false)
   env:
     FEED_ID: $(feedId)
 
@@ -10,6 +16,7 @@ steps:
     python ./common/check_feed_permissions.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --groupName $(developers-group-name) --groupSid $(developers-group-sid) --feedId $Env:FEED_ID --role $(developers-feed-permissions) --pat $(onprem_pat)
   displayName: 'Check Feed permissions for $(projectName)-developers group'
   continueOnError: true
+  condition: ne(variables.createArtifactFeed,false)
   env:
     FEED_ID: $(feedId)
 
@@ -17,6 +24,7 @@ steps:
     python ./common/check_feed_permissions.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --groupName $(auditors-group-name) --groupSid $(auditors-group-sid) --feedId $Env:FEED_ID --role $(auditors-feed-permissions) --pat $(onprem_pat)
   displayName: 'Check Feed permissions for $(projectName)-auditors group'
   continueOnError: true
+  condition: ne(variables.createArtifactFeed,false)
   env:
     FEED_ID: $(feedId)
 
@@ -24,5 +32,6 @@ steps:
     python ./common/check_feed_permissions.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --groupName $(product-owners-group-name) --groupSid $(product-owners-group-sid) --feedId $Env:FEED_ID --role $(product-owners-feed-permissions) --pat $(onprem_pat)
   displayName: 'Check Feed permissions for $(projectName)-product-owners group'
   continueOnError: true
+  condition: ne(variables.createArtifactFeed,false)
   env:
     FEED_ID: $(feedId)

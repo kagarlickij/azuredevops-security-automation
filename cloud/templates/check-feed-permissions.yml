@@ -1,6 +1,12 @@
 steps:
 - task: PythonScript@0
   inputs:
+    scriptPath: ./common/export_feed_info.py
+    arguments: '--organization https://feeds.dev.azure.com/kagarlickij --feedName $(projectName) --pat $(cloud_pat)'
+  displayName: 'Export feed-related info'
+
+- task: PythonScript@0
+  inputs:
     scriptPath: ./common/check_feed_permissions.py
     arguments: '--organization https://feeds.dev.azure.com/kagarlickij --projectName $(projectName) --groupName $(administrators-group-name) --groupSid $(administrators-group-sid) --feedId $(feedId) --role $(administrators-feed-permissions) --pat $(cloud_pat)'
   continueOnError: true

@@ -22,18 +22,13 @@ schedules:
 
 variables:
 - name: projectName
-  value: 'templ-test47'
-
+  value: 'templ-test50'
+- name: createArtifactFeed
+  value: true
 - group: ados-group-names-templ-test01
 - group: ados-acls-templ-test01
 - group: ados-git-params-templ-test01
 - group: ados-secrets
-
-parameters:
-- name: checkArtifactFeed
-  displayName: 'Check Artifact Feed?'
-  type: boolean
-  default: false
 
 jobs:
 - job: create_project
@@ -48,29 +43,11 @@ jobs:
     displayName: 'Install requirements'
     continueOnError: true
 
-
   - powershell: |
       python ./onprem/export_project_info.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --projectName $(projectName) --pat $(onprem_pat)
     displayName: 'Export project-related info'
 
-
-  - powershell: |
-      python ./onprem/export_group_info.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --projectId $(projectId) --groupName $(administrators-group-name) --groupSid $(administrators-group-sid)
-    displayName: 'Export $(projectName)-administrators group info'
-
-  - powershell: |
-      python ./onprem/export_group_info.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --projectId $(projectId) --groupName $(developers-group-name) --groupSid $(developers-group-sid)
-    displayName: 'Export $(projectName)-developers group info'
-
-  - powershell: |
-      python ./onprem/export_group_info.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --projectId $(projectId) --groupName $(auditors-group-name) --groupSid $(auditors-group-sid)
-    displayName: 'Export $(projectName)-auditors group info'
-
-  - powershell: |
-      python ./onprem/export_group_info.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --projectId $(projectId) --groupName $(product-owners-group-name) --groupSid $(product-owners-group-sid)
-    displayName: 'Export $(projectName)-product-owners group info'
-
-
+  - template: ./templates/export-groups-info.yml
   - template: ./templates/check-groups.yml
   - template: ./templates/check-project-permissions.yml
   - template: ./templates/check-analytics-permissions.yml
@@ -78,9 +55,4 @@ jobs:
   - template: ./templates/check-git.yml
   - template: ./templates/check-build-permissions.yml
   - template: ./templates/check-release-permissions.yml
-
-  - ${{ if eq(parameters.checkArtifactFeed, true) }}:
-    - powershell: |
-        python ./common/export_feed_info.py --organization 'https://ados.demo.kagarlickij.com/DefaultCollection' --feedName $(projectName) --pat $(onprem_pat)
-      displayName: 'Export feed-related info'
-    - template: ./templates/check-feed-permissions.yml
+  - template: ./templates/check-feed-permissions.yml
