@@ -30,8 +30,9 @@
 	* [Azure DevOps specific syntax in scripts](#Azure-DevOps-specific-syntax-in-scripts)
 * [Contribution](#Contribution)
 	* [pre-commit and pre-push hooks](#pre-commit-and-pre-push-hooks)
-	* [Pull request validation](#Pull-request-validation)
+	* [Pull request validation:](#Pull-request-validation:)
 	* [Build](#Build)
+* [Known issues](#Known-issues)
 
 # Challenge
 Azure DevOps gives a nice opportunity to have dedicated projects for dedicated teams and/or projects  
@@ -433,5 +434,10 @@ This job's successful result is "warning", "success" will mean fail like in typi
 
 ## Build
 When code is merged into `master` branch build job generates pylint badge referenced on top of this file  
-[generate_pylint_badge](generate_pylint_badge.py) script uses [pylint](https://www.pylint.org/) to generate score, [anybadge](https://pypi.org/project/anybadge/) to generate png and [GitHub Gist API](https://developer.github.com/v3/gists/) to push svg to [GitHub Gist](https://gist.githubusercontent.com/kagarlickij/780fabe68201e08c8f2151ad02898bad/raw/pylint.svg) which is used for svg hosting  
+[generate_pylint_badge](./common/generate_pylint_badge.py) script uses [pylint](https://www.pylint.org/) to generate score, [anybadge](https://pypi.org/project/anybadge/) to generate png and [GitHub Gist API](https://developer.github.com/v3/gists/) to push svg to [GitHub Gist](https://gist.githubusercontent.com/kagarlickij/780fabe68201e08c8f2151ad02898bad/raw/pylint.svg) which is used for svg hosting  
 [Build pipeline](./cloud/build.yml) installs `pylint` and `anybadge` binaries on Azure DevOps agent for [generate_pylint_badge](./common/generate_pylint_badge.py) script because Python packages for both `pylint` and `anybadge` don't work correctly: [anybadge issue](https://github.com/jongracecox/anybadge/issues/42), [epylint issue](https://stackoverflow.com/questions/61485537/epylint-output-to-variable)
+
+# Known issues
+1. `pylint` cmd in [generate_pylint_badge](./common/generate_pylint_badge.py) causes Bandit `[B602:subprocess_popen_with_shell_equals_true]` issue  
+It's better to replace `pylint` cmd with `epylint` but it has an issue with [output to variable](https://stackoverflow.com/questions/61485537/epylint-output-to-variable)  
+2. For on-premise `pylint` execution for all files [doesn't work on windows](https://stackoverflow.com/questions/62488844/run-pylint-against-all-files-in-windows)  

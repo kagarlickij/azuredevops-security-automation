@@ -35,8 +35,7 @@ jobs:
     displayName: 'Install Python requirements'
   - bash: |
       pip install --disable-pip-version-check --ignore-installed --quiet --version pylint==2.5.0
-      pip install --disable-pip-version-check --ignore-installed --quiet anybadge==1.7.0
-    displayName: 'Install pylint and anybadge'
+    displayName: 'Install pylint'
   - task: PythonScript@0
     displayName: 'Generate pylint badge'
     inputs:
