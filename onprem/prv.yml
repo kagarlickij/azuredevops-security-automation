@@ -27,7 +27,7 @@ variables:
 jobs:
 - job: pylint
   displayName: 'Lint Python code'
-  condition: eq(variables['System.PullRequest.TargetBranch'], 'master')
+  condition: eq(variables['System.PullRequest.TargetBranch'], 'refs/heads/master')
   pool:
     name: Default
   steps:
